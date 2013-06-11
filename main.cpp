@@ -23,6 +23,8 @@
 #include <QtDeclarative>
 #include <QtOpenGL>
 
+#include "qdesktopwidget.h"
+
 extern "C" {
 #include <pty.h>
 #include <stdlib.h>
@@ -95,6 +97,11 @@ int main(int argc, char *argv[])
     }
 
     QApplication app(argc, argv);
+
+    if(!settings->contains("screen/width"))
+        settings->setValue("screen/width", QVariant(QApplication::desktop()->width()));
+    if(!settings->contains("screen/height"))
+        settings->setValue("screen/height", QVariant(QApplication::desktop()->height()));
 
     qmlRegisterType<TextRender>("TextRender",1,0,"TextRender");
     MainWindow view;
