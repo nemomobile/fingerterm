@@ -32,8 +32,8 @@ Rectangle {
 
     id: window
     objectName: "window"
-    width: 854
-    height: 480
+    width: util.settingsValue("screen/width")
+    height: util.settingsValue("screen/height")
     color: bgcolor
 
     NotifyWin {
