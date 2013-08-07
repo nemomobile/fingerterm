@@ -1,0 +1,3 @@
+Fingerterm mainline now focuses on Qt5/QtQuick2 only, and will drop Qt4
+and MTF compatibility at some point. This branch serves as Harmattan
+maintenance branch, if updates to the Harmattan version are required.
