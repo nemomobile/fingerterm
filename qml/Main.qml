@@ -204,6 +204,7 @@ ApplicationWindow {
             MouseArea {
                 anchors.fill: parent
                 onClicked: {
+                    pageStack.push(menuPage);
                     menu.showMenu();
                 }
             }
@@ -216,12 +217,6 @@ ApplicationWindow {
             anchors.bottom: parent.bottom
             visible: textrender.showBufferScrollIndicator
             z: 5
-        }
-
-        MenuFingerterm {
-            id: menu
-            x: window.width-width
-            y: 0
         }
 
         TextRender {
@@ -430,7 +425,7 @@ ApplicationWindow {
 
         function updateGesturesAllowed()
         {
-            if(vkb.active || menu.showing || urlWindow.state=="visible" ||
+            if(vkb.active || urlWindow.state=="visible" ||
                     aboutDialog.state=="visible" || layoutWindow.state=="visible")
                 util.allowGestures = false;
             else
@@ -464,4 +459,12 @@ ApplicationWindow {
     }
     }
 
+    Page {
+        id: menuPage
+
+        MenuFingerterm {
+            id: menu
+            anchors.fill: parent
+        }
+    }
 }

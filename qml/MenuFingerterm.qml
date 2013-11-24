@@ -20,14 +20,8 @@
 import QtQuick 2.0
 import QtQuick.XmlListModel 2.0
 
-Rectangle {
+Item {
     id: menuWin
-    color: "transparent"
-    z: 30
-    width: window.width
-    height: window.height
-    visible: false
-    property bool showing: false
     property bool enableCopy: false
     property bool enablePaste: false
     property string currentSwipeLocking: util.settingsValue("ui/allowSwipe")
@@ -36,44 +30,13 @@ Rectangle {
     property string currentOrientationLockMode: util.settingsValue("ui/orientationLockMode")
     property int keyboardFadeOutDelay: util.settingsValue("ui/keyboardFadeOutDelay")
 
-    Rectangle {
-        id: fader
-        color: "#000000"
-        opacity: 0
-        y: 0
-        x: 0
-        width: menuWin.width
-        height: menuWin.height
-        MouseArea {
-            anchors.fill: parent
-            onClicked: {
-                hideMenu();
-            }
+    Item {
+        anchors {
+            top: parent.top
+            bottom: parent.bottom
+            horizontalCenter: parent.horizontalCenter
         }
-        Behavior on opacity {
-            SequentialAnimation {
-                NumberAnimation { duration: 100; }
-                ScriptAction { script: menuWin.visible = menuWin.showing; }
-            }
-        }
-    }
-    Rectangle {
-        id: rect
-        color: "#e0e0e0"
-        y: 0
-        x: menuWin.width+1;
-        width: flickableContent.width + 22;
-        height: menuWin.height
-        z: 35
-
-        MouseArea {
-            // event eater
-            anchors.fill: parent
-        }
-
-        Behavior on x {
-            NumberAnimation { duration: 100; easing.type: Easing.InOutQuad; }
-        }
+        width: flickableContent.width
 
         XmlListModel {
             id: xmlModel
@@ -515,14 +478,6 @@ Rectangle {
         }
     }
 
-    onWidthChanged: {
-        if(showing) {
-            showMenu();
-        } else {
-            hideMenu();
-        }
-    }
-
     Connections {
         target: util
         onClipboardOrSelectionChanged: {
@@ -533,21 +488,13 @@ Rectangle {
 
     function showMenu()
     {
-        showing = true;
-        visible = true;
-        fader.opacity = 0.5;
-        rect.x = menuWin.width-rect.width;
-        window.updateGesturesAllowed();
         enableCopy = util.terminalHasSelection();
         enablePaste = util.canPaste();
     }
 
     function hideMenu()
     {
-        showing = false;
-        fader.opacity = 0;
-        rect.x = menuWin.width+1;
-        window.updateGesturesAllowed();
+        pageStack.pop();
     }
 
     function changeSwipeLocking(state)
