@@ -14,7 +14,7 @@ BuildRequires: pkgconfig(Qt5Quick)
 BuildRequires: pkgconfig(Qt0Feedback)
 Requires: qt5-qtdeclarative-import-xmllistmodel
 Requires: qt5-qtdeclarative-import-window2
-Requires: qt-components-qt5
+Requires: sailfishsilica-qt5
 Obsoletes: meego-terminal <= 0.2.2
 Provides: meego-terminal > 0.2.2
 

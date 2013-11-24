@@ -18,6 +18,7 @@
 */
 
 import QtQuick 2.0
+import Sailfish.Silica 1.0
 
 Rectangle {
     id: keyboard
@@ -31,10 +32,10 @@ Rectangle {
     property variant currentStickyPressed: null
     property variant currentKeyPressed: 0
 
-    property string keyFgColor: "#ffffff"
-    property string keyBgColor: "#202020"
-    property string keyHilightBgColor: "#ffffff"
-    property string keyBorderColor: "#303030"
+    property string keyFgColor: Theme.primaryColor
+    property string keyBgColor: "#66000000"
+    property string keyHilightBgColor: Theme.secondaryColor
+    property string keyBorderColor: '#66ffffff'
 
     property bool active: false
 

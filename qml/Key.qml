@@ -41,7 +41,7 @@ Rectangle {
     width: window.width/12   // some default
     height: window.height/8 < 55 ? window.height/8 : 55
     color: label=="" ? "transparent" : keyboard.keyBgColor
-    border.color: label=="" ? "transparent" : keyboard.keyBorderColor
+    border.color: (!keyboard.active || label=="") ? "transparent" : keyboard.keyBorderColor
     border.width: 1
     radius: 5
 

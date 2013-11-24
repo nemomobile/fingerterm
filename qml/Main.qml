@@ -19,33 +19,33 @@
 
 import QtQuick 2.0
 import TextRender 1.0
-import QtQuick.Window 2.0
-import com.nokia.meego 2.0
+import Sailfish.Silica 1.0
 
-PageStackWindow {
-    id: pageStackWindow
-
-    focus: true
+ApplicationWindow {
+    id: appWindow
+    property string windowTitle: util.currentWindowTitle()
+    property variant lines: []
 
     Keys.onPressed: {
         window.vkbKeypress(event.key,event.modifiers);
     }
 
-    initialPage:Page {
-        id: page
-        anchors.fill: parent
+    cover: Qt.resolvedUrl("Cover.qml")
 
-        orientationLock: window.getOrientationLockMode()
+    initialPage: Page {
+        id: page
+
+        //orientationLock: window.getOrientationLockMode()
+        allowedOrientations: Orientation.All
 
         Rectangle {
         property string fgcolor: "black"
-        property string bgcolor: "#000000"
+        property string bgcolor: "#88000000"
         property int fontSize: 14
 
         property int fadeOutTime: 80
         property int fadeInTime: 350
 
-        property string windowTitle: util.currentWindowTitle();
 
         anchors.fill: parent
 
@@ -65,8 +65,8 @@ PageStackWindow {
                         util.configPath() + "/<br><br>\n" +
                         "Documentation:<br>\n<a href=\"http://hqh.unlink.org/harmattan\">http://hqh.unlink.org/harmattan</a>"
                 if (termH != 0 && termW != 0) {
-                    str += "<br><br>Current window title: <font color=\"gray\">" + windowTitle.substring(0,40) + "</font>"; //cut long window title
-                    if(windowTitle.length>40)
+                    str += "<br><br>Current window title: <font color=\"gray\">" + appWindow.windowTitle.substring(0,40) + "</font>"; //cut long window title
+                    if(appWindow.windowTitle.length>40)
                         str += "...";
                     str += "<br>Current terminal size: <font color=\"gray\">" + termW + "x" + termH + "</font>";
                     str += "<br>Charset: <font color=\"gray\">" + util.settingsValue("terminal/charset") + "</font>";
@@ -290,7 +290,7 @@ PageStackWindow {
                 textNotify.opacity = 0;
             }
             onWindowTitleChanged: {
-                windowTitle = util.currentWindowTitle();
+                appWindow.windowTitle = util.currentWindowTitle()
             }
         }
 
@@ -320,10 +320,10 @@ PageStackWindow {
             width: 0
             height: 0
             radius: 5
-            color: "#ffffff"
+            color: Theme.highlightColor
             property string label: ""
             Text {
-                color: "#000000"
+                color: Theme.primaryColor
                 font.pointSize: 34
                 anchors.centerIn: parent
                 text: visualKeyFeedbackRect.label
@@ -403,6 +403,7 @@ PageStackWindow {
         function displayBufferChanged()
         {
             lineView.lines = term.printableLinesFromCursor(util.settingsValue("ui/showExtraLinesFromCursor"));
+            appWindow.lines = term.printableLinesFromCursor(30);
             lineView.cursorX = textrender.cursorPixelPos().x;
             lineView.cursorWidth = textrender.cursorPixelSize().width;
             lineView.cursorHeight = textrender.cursorPixelSize().height;
@@ -436,6 +437,7 @@ PageStackWindow {
                 util.allowGestures = true;
         }
 
+        /*
         function lockModeStringToQtEnum(stringMode) {
             switch (stringMode) {
             case "auto":
@@ -458,6 +460,7 @@ PageStackWindow {
             util.setSettingsValue("ui/orientationLockMode", stringMode);
             page.orientationLock = lockModeStringToQtEnum(stringMode)
         }
+        */
     }
     }
 

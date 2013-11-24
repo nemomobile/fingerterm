@@ -95,6 +95,8 @@ int main(int argc, char *argv[])
 
     QGuiApplication app(argc, argv);
 
+    QQuickWindow::setDefaultAlphaBuffer(true);
+
     QScreen* sc = app.primaryScreen();
     if(sc){
     sc->setOrientationUpdateMask(Qt::PrimaryOrientation
