@@ -12,6 +12,7 @@ BuildRequires: pkgconfig(Qt5Gui)
 BuildRequires: pkgconfig(Qt5Qml)
 BuildRequires: pkgconfig(Qt5Quick)
 BuildRequires: pkgconfig(Qt0Feedback)
+BuildRequires: pkgconfig(sailfishapp)
 Requires: qt5-qtdeclarative-import-xmllistmodel
 Requires: qt5-qtdeclarative-import-window2
 Requires: sailfishsilica-qt5
@@ -24,7 +25,9 @@ Provides: meego-terminal > 0.2.2
 %files
 %defattr(-,root,root,-)
 %{_bindir}/*
-%{_datadir}/applications/*.desktop
+%{_datadir}/applications/%{name}.desktop
+%{_datadir}/icons/hicolor/86x86/apps/%{name}.png
+%{_datadir}/%{name}
 
 
 %prep
@@ -32,11 +35,10 @@ Provides: meego-terminal > 0.2.2
 
 
 %build
-sed -i 's,/opt/fingerterm/,/usr/,' fingerterm.pro
-qmake -qt=5 MEEGO_EDITION=nemo
+%qmake5
 make %{?_smp_mflags}
 
 
 %install
 rm -rf %{buildroot}
-make INSTALL_ROOT=%{buildroot} install
+%qmake5_install

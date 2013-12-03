@@ -113,7 +113,7 @@ ApplicationWindow {
             property bool visibleSetting: true
             x: 0
             y: parent.height-vkb.height
-            visible: windowHasFocus && visibleSetting
+            visible: visibleSetting
         }
 
         // area that handles gestures/select/scroll modes and vkb-keypresses
@@ -197,7 +197,7 @@ ApplicationWindow {
             Image {
                 anchors.centerIn: parent
                 id: menuImg
-                source: "qrc:/icons/menu.png"
+                source: "icons/menu.png"
                 height: sourceSize.height
                 width: sourceSize.width
             }
@@ -212,7 +212,7 @@ ApplicationWindow {
 
         Image {
             // terminal buffer scroll indicator
-            source: "qrc:/icons/scroll-indicator.png"
+            source: "icons/scroll-indicator.png"
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.bottom: parent.bottom
             visible: textrender.showBufferScrollIndicator

@@ -19,6 +19,10 @@
 
 #include "qplatformdefs.h"
 
+#include <QtQuick>
+
+#include <sailfishapp.h>
+
 #include <QtGui>
 #include <QtQml>
 
@@ -30,12 +34,6 @@ extern "C" {
 #include <sys/types.h>
 }
 
-#ifdef MEEGO_EDITION_HARMATTAN
-#include <MComponentData>
-#include "dbusadaptor.h"
-#endif
-
-#include "mainwindow.h"
 #include "ptyiface.h"
 #include "terminal.h"
 #include "textrender.h"
@@ -44,7 +42,7 @@ extern "C" {
 #include "keyloader.h"
 
 void defaultSettings(QSettings* settings);
-void copyFileFromResources(QString from, QString to);
+void copyFilesFromPath(QString from, QString to);
 
 int main(int argc, char *argv[])
 {
@@ -93,11 +91,9 @@ int main(int argc, char *argv[])
         exit(0);
     }
 
-    QGuiApplication app(argc, argv);
+    QGuiApplication *app = static_cast<QGuiApplication *>(SailfishApp::application(argc, argv));
 
-    QQuickWindow::setDefaultAlphaBuffer(true);
-
-    QScreen* sc = app.primaryScreen();
+    QScreen* sc = app->primaryScreen();
     if(sc){
     sc->setOrientationUpdateMask(Qt::PrimaryOrientation
                                  | Qt::LandscapeOrientation
@@ -107,15 +103,7 @@ int main(int argc, char *argv[])
     }
 
     qmlRegisterType<TextRender>("TextRender",1,0,"TextRender");
-    MainWindow view;
-
-#ifdef MEEGO_EDITION_HARMATTAN
-    DbusAdaptor *dba = new DbusAdaptor();
-    dba->setAppWindow(&view);
-
-    // needed for MFeedback, also creates the dbus interface
-    MComponentData::createInstance(argc, argv, "fingerterm", dba);
-#endif
+    QQuickView *view = SailfishApp::createView();
 
     Terminal term;
     Util util(settings);
@@ -123,9 +111,7 @@ int main(int argc, char *argv[])
     QString startupErrorMsg;
 
     // copy the default config files to the config dir if they don't already exist
-    copyFileFromResources(":/data/menu.xml", util.configPath()+"/menu.xml");
-    copyFileFromResources(":/data/english.layout", util.configPath()+"/english.layout");
-    copyFileFromResources(":/data/finnish.layout", util.configPath()+"/finnish.layout");
+    copyFilesFromPath(SailfishApp::pathTo("data").toLocalFile(), util.configPath());
 
     KeyLoader keyLoader;
     keyLoader.setUtil(&util);
@@ -139,14 +125,14 @@ int main(int argc, char *argv[])
             qFatal("failure loading keyboard layout");
     }
 
-    QQmlContext *context = view.rootContext();
+    QQmlContext *context = view->rootContext();
     context->setContextProperty( "term", &term );
     context->setContextProperty( "util", &util );
     context->setContextProperty( "keyLoader", &keyLoader );
 
-    view.setSource(QUrl("qrc:/qml/Main.qml"));
+    view->setSource(SailfishApp::pathTo("qml/Main.qml"));
 
-    QObject *root = view.rootObject();
+    QObject *root = view->rootObject();
     if(!root)
         qFatal("no root object - qml error");
 
@@ -159,25 +145,22 @@ int main(int argc, char *argv[])
     tr->setUtil(&util);
     tr->setTerminal(&term);
     term.setRenderer(tr);
-    term.setWindow(&view);
-    util.setWindow(&view);
+    term.setWindow(view);
+    util.setWindow(view);
     util.setTerm(&term);
     util.setRenderer(tr);
 
     QObject::connect(&term,SIGNAL(displayBufferChanged()),win,SLOT(displayBufferChanged()));
-    QObject::connect(view.engine(),SIGNAL(quit()),&app,SLOT(quit()));
+    QObject::connect(view->engine(),SIGNAL(quit()),app,SLOT(quit()));
 
-#ifdef MEEGO_EDITION_HARMATTAN
-    view.showFullScreen();
-#else
     QSize screenSize = QGuiApplication::primaryScreen()->size();
-    if ((screenSize.width() < 1024 || screenSize.height() < 768 || app.arguments().contains("-fs"))
-            && !app.arguments().contains("-nofs"))
+    if ((screenSize.width() < 1024 || screenSize.height() < 768 || app->arguments().contains("-fs"))
+            && !app->arguments().contains("-nofs"))
     {
-        view.showFullScreen();
-    } else
-        view.show();
-#endif
+        view->showFullScreen();
+    } else {
+        view->show();
+    }
 
     PtyIFace ptyiface(pid, socketM, &term,
                        settings->value("terminal/charset").toString());
@@ -185,7 +168,7 @@ int main(int argc, char *argv[])
     if( ptyiface.failed() )
         qFatal("pty failure");
 
-    return app.exec();
+    return app->exec();
 }
 
 void defaultSettings(QSettings* settings)
@@ -250,18 +233,13 @@ void defaultSettings(QSettings* settings)
         settings->setValue("gestures/panDownCommand", "\\e[5~");
 }
 
-void copyFileFromResources(QString from, QString to)
+void copyFilesFromPath(QString from, QString to)
 {
-    // copy a file from resources to the config dir if it does not exist there
-    QFileInfo toFile(to);
-    if(!toFile.exists()) {
-        QFile newToFile(toFile.absoluteFilePath());
-        QResource res(from);
-        if (newToFile.open(QIODevice::WriteOnly)) {
-            newToFile.write( reinterpret_cast<const char*>(res.data()) );
-            newToFile.close();
-        } else {
-            qFatal("failed to copy default config from resources");
-        }
+    QDir fromDir(from);
+    QDir toDir(to);
+
+    // Copy files from fromDir to toDir, but don't overwrite existing ones
+    foreach (const QString &filename, fromDir.entryList(QDir::Files)) {
+        QFile(fromDir.filePath(filename)).copy(toDir.filePath(filename));
     }
 }

@@ -23,7 +23,6 @@
 #include <QtCore>
 
 class Terminal;
-class MainWindow;
 class TextRender;
 class QQuickView;
 
@@ -49,7 +48,6 @@ public:
     Q_INVOKABLE void setSettingsValue(QString key, QVariant value);
 
     Q_INVOKABLE int uiFontSize();
-    Q_INVOKABLE bool isHarmattan();
 
     Q_INVOKABLE void keyPressFeedback();
     Q_INVOKABLE void keyReleaseFeedback();
@@ -70,7 +68,6 @@ public:
     static bool charIsHexDigit(QChar ch);
 
 public slots:
-    void onMainWinFocusChanged(bool in);
     void mousePress(float eventX, float eventY);
     void mouseMove(float eventX, float eventY);
     void mouseRelease(float eventX, float eventY);
@@ -104,7 +101,7 @@ private:
     QString iCurrentWinTitle;
 
     QSettings* iSettings;
-    MainWindow* iWindow;
+    QQuickView* iWindow;
     Terminal* iTerm;
     TextRender* iRenderer;
 };
