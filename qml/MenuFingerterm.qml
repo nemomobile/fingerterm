@@ -162,26 +162,21 @@ Item {
                             title: 'Settings'
                         }
 
-                        ComboBox {
-                            label: 'Font size'
-                            menu: ContextMenu {
-                                MenuItem {
-                                    text: 'Increase'
-                                    onClicked: {
-                                        textrender.fontPointSize = textrender.fontPointSize + 1;
-                                        lineView.fontPointSize = textrender.fontPointSize;
-                                        util.notifyText(term.termSize().width+"x"+term.termSize().height);
-                                    }
-                                }
+                        Slider {
+                            id: fontSizeSlider
+                            width: parent.width
 
-                                MenuItem {
-                                    text: 'Decrease'
-                                    onClicked: {
-                                        textrender.fontPointSize = textrender.fontPointSize - 1;
-                                        lineView.fontPointSize = textrender.fontPointSize;
-                                        util.notifyText(term.termSize().width+"x"+term.termSize().height);
-                                    }
-                                }
+                            label: 'Font size'
+                            valueText: '' + Math.floor(value) + ' pt'
+
+                            value: util.settingsValue("ui/fontSize")
+                            minimumValue: 8
+                            maximumValue: 80
+
+                            onValueChanged: {
+                                textrender.fontPointSize = Math.floor(value);
+                                lineView.fontPointSize = textrender.fontPointSize;
+                                util.notifyText(term.termSize().width+"x"+term.termSize().height);
                             }
                         }
 

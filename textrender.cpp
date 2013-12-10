@@ -279,6 +279,11 @@ void TextRender::updateTermSize()
 
 void TextRender::setFontPointSize(int psize)
 {
+    if (!iUtil) {
+        qWarning("setFontPointSize without iUtil");
+        return;
+    }
+
     if (iFont.pointSize() != psize)
     {
         iFont.setPointSize(psize);
