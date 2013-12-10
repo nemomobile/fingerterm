@@ -1,5 +1,5 @@
 Name: fingerterm
-Version: 1.0.3
+Version: 1.2.0
 Release: 1
 Summary: A terminal emulator with a custom virtual keyboard
 Group: System/Base
@@ -35,6 +35,9 @@ Provides: meego-terminal > 0.2.2
 
 
 %build
+# Inject version number from RPM into source
+sed -i -e 's/PROGRAM_VERSION="[^"]*"/PROGRAM_VERSION="%{version}"/g' version.h
+
 %qmake5
 make %{?_smp_mflags}
 
