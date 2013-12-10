@@ -14,7 +14,7 @@ CoverBackground {
         }
 
         font {
-            pixelSize: theme.fontSizeSmall
+            pixelSize: Theme.fontSizeSmall
         }
 
         color: Theme.highlightColor

@@ -19,6 +19,7 @@
 
 import QtQuick 2.0
 import QtQuick.XmlListModel 2.0
+import Sailfish.Silica 1.0
 
 Item {
     id: menuWin
@@ -50,10 +51,18 @@ Item {
 
         Component {
             id: xmlDelegate
-            Button {
-                text: title
-                isShellCommand: true
+            BackgroundItem {
+                width: menuWin.width
                 enabled: disableOn.length === 0 || window.windowTitle.search(disableOn) === -1
+                Label {
+                    text: title
+                    color: highlighted ? Theme.highlightColor : Theme.primaryColor
+                    anchors {
+                        verticalCenter: parent.verticalCenter
+                        left: parent.left
+                        leftMargin: Theme.paddingMedium
+                    }
+                }
                 onClicked: {
                     hideMenu();
                     term.putString(command, true);
@@ -61,43 +70,74 @@ Item {
             }
         }
 
-        Rectangle {
-            id: scrollIndicator
-            y: menuFlickArea.visibleArea.yPosition*menuFlickArea.height + 6
-            x: parent.width-10
-            width: 6
-            height: menuFlickArea.visibleArea.heightRatio*menuFlickArea.height
-            radius: 3
-            color: "#202020"
-        }
-
-        Flickable {
+        SilicaFlickable {
             id: menuFlickArea
             anchors.fill: parent
-            anchors.topMargin: 6
-            anchors.bottomMargin: 6
-            anchors.leftMargin: 6
-            anchors.rightMargin: 16
             contentHeight: flickableContent.height
+
+            PullDownMenu {
+                MenuItem {
+                    text: "About"
+                    onClicked: {
+                        hideMenu();
+                        aboutDialog.termW = term.termSize().width
+                        aboutDialog.termH = term.termSize().height
+                        aboutDialog.state = "visible"
+                    }
+                }
+                MenuItem {
+                    text: "Keyboard layout"
+                    onClicked: {
+                        hideMenu();
+                        layoutWindow.layouts = keyLoader.availableLayouts();
+                        layoutWindow.state = "visible";
+                    }
+                }
+                MenuItem {
+                    text: "URL grabber"
+                    onClicked: {
+                        hideMenu();
+                        urlWindow.urls = term.grabURLsFromBuffer();
+                        urlWindow.state = "visible";
+                    }
+                }
+                MenuItem {
+                    text: "New window"
+                    onClicked: {
+                        hideMenu();
+                        util.openNewWindow();
+                    }
+                }
+            }
+
+            VerticalScrollDecorator { flickable: menuFlickArea }
 
             Column {
                 id: flickableContent
+                width: menuWin.width
                 spacing: 12
 
                 Row {
                     id: menuBlocksRow
+                    width: menuWin.width
                     spacing: 8
 
                     Column {
                         spacing: 12
+                        width: menuWin.width
+
+                        PageHeader {
+                            title: 'Shortcuts'
+                        }
+
                         Repeater {
                             model: xmlModel
                             delegate: xmlDelegate
                         }
-                    }
 
-                    Column {
-                        spacing: 12
+                        PageHeader {
+                            title: 'Clipboard'
+                        }
 
                         Row {
                             Button {
@@ -106,7 +146,6 @@ Item {
                                     hideMenu();
                                     term.copySelectionToClipboard();
                                 }
-                                width: 90
                                 enabled: menuWin.enableCopy
                             }
                             Button {
@@ -115,257 +154,132 @@ Item {
                                     hideMenu();
                                     term.pasteFromClipboard();
                                 }
-                                width: 90
                                 enabled: menuWin.enablePaste
                             }
                         }
-                        Button {
-                            text: "URL grabber"
-                            onClicked: {
-                                hideMenu();
-                                urlWindow.urls = term.grabURLsFromBuffer();
-                                urlWindow.state = "visible";
-                            }
+
+                        PageHeader {
+                            title: 'Settings'
                         }
-                        Rectangle {
-                            width: 180
-                            height: 68
-                            radius: 5
-                            color: "#606060"
-                            border.color: "#000000"
-                            border.width: 1
-                            Column {
-                                Text {
-                                    width: 180
-                                    height: 20
-                                    color: "#ffffff"
-                                    font.pointSize: util.uiFontSize()-1;
-                                    text: "Font size"
-                                    horizontalAlignment: Text.AlignHCenter
-                                }
-                                Row {
-                                    Button {
-                                        text: "<font size=\"+3\">+</font>"
-                                        onClicked: {
-                                            textrender.fontPointSize = textrender.fontPointSize + 1;
-                                            lineView.fontPointSize = textrender.fontPointSize;
-                                            util.notifyText(term.termSize().width+"x"+term.termSize().height);
-                                        }
-                                        width: 90
-                                        height: 48
+
+                        ComboBox {
+                            label: 'Font size'
+                            menu: ContextMenu {
+                                MenuItem {
+                                    text: 'Increase'
+                                    onClicked: {
+                                        textrender.fontPointSize = textrender.fontPointSize + 1;
+                                        lineView.fontPointSize = textrender.fontPointSize;
+                                        util.notifyText(term.termSize().width+"x"+term.termSize().height);
                                     }
-                                    Button {
-                                        text: "<font size=\"+3\">-</font>"
-                                        onClicked: {
-                                            textrender.fontPointSize = textrender.fontPointSize - 1;
-                                            lineView.fontPointSize = textrender.fontPointSize;
-                                            util.notifyText(term.termSize().width+"x"+term.termSize().height);
-                                        }
-                                        width: 90
-                                        height: 48
+                                }
+
+                                MenuItem {
+                                    text: 'Decrease'
+                                    onClicked: {
+                                        textrender.fontPointSize = textrender.fontPointSize - 1;
+                                        lineView.fontPointSize = textrender.fontPointSize;
+                                        util.notifyText(term.termSize().width+"x"+term.termSize().height);
                                     }
                                 }
                             }
                         }
-                        Rectangle {
-                            width: 180
-                            height: 68
-                            radius: 5
-                            color: "#606060"
-                            border.color: "#000000"
-                            border.width: 1
-                            Column {
-                                Text {
-                                    width: 180
-                                    height: 20
-                                    color: "#ffffff"
-                                    font.pointSize: util.uiFontSize()-1;
-                                    text: "UI Orientation"
-                                    horizontalAlignment: Text.AlignHCenter
+
+                        ComboBox {
+                            label: 'UI Orientation'
+                            // TODO: Set selection on load (from currentOrientationLockMode)
+                            menu: ContextMenu {
+                                MenuItem {
+                                    text: 'Auto'
+                                    onClicked: {
+                                        currentOrientationLockMode = "auto";
+                                        window.setOrientationLockMode("auto");
+                                    }
                                 }
-                                Row {
-                                    Button {
-                                        text: "<font size=\"-1\">Auto</font>"
-                                        highlighted: currentOrientationLockMode=="auto"
-                                        onClicked: {
-                                            currentOrientationLockMode = "auto";
-                                            window.setOrientationLockMode("auto");
-                                        }
-                                        width: 60
-                                        height: 48
+                                MenuItem {
+                                    text: 'Landscape'
+                                    onClicked: {
+                                        currentOrientationLockMode = "landscape";
+                                        window.setOrientationLockMode("landscape");
                                     }
-                                    Button {
-                                        text: "<font size=\"-1\">L<font>"
-                                        highlighted: currentOrientationLockMode=="landscape"
-                                        onClicked: {
-                                            currentOrientationLockMode = "landscape";
-                                            window.setOrientationLockMode("landscape");
-                                        }
-                                        width: 60
-                                        height: 48
-                                    }
-                                    Button {
-                                        text: "<font size=\"-1\">P</font>"
-                                        highlighted: currentOrientationLockMode=="portrait"
-                                        onClicked: {
-                                            currentOrientationLockMode = "portrait";
-                                            window.setOrientationLockMode("portrait");
-                                        }
-                                        width: 60
-                                        height: 48
+                                }
+                                MenuItem {
+                                    text: 'Portrait'
+                                    onClicked: {
+                                        currentOrientationLockMode = "portrait";
+                                        window.setOrientationLockMode("portrait");
                                     }
                                 }
                             }
                         }
-                        Rectangle {
-                            width: 180
-                            height: 68
-                            radius: 5
-                            color: "#606060"
-                            border.color: "#000000"
-                            border.width: 1
-                            Column {
-                                Text {
-                                    width: 180
-                                    height: 20
-                                    color: "#ffffff"
-                                    font.pointSize: util.uiFontSize()-1;
-                                    text: "Drag mode"
-                                    horizontalAlignment: Text.AlignHCenter
+
+                        ComboBox {
+                            label: 'Drag mode'
+                            // TODO: Set selection on load (from currentDragMode)
+                            menu: ContextMenu {
+                                MenuItem {
+                                    text: 'Gesture'
+                                    onClicked: {
+                                        util.setSettingsValue("ui/dragMode", "gestures");
+                                        term.clearSelection();
+                                        currentDragMode = "gestures";
+                                        hideMenu();
+                                    }
                                 }
-                                Row {
-                                    Button {
-                                        text: "<font size=\"-1\">Gesture</font>"
-                                        highlighted: currentDragMode=="gestures"
-                                        onClicked: {
-                                            util.setSettingsValue("ui/dragMode", "gestures");
-                                            term.clearSelection();
-                                            currentDragMode = "gestures";
-                                            hideMenu();
-                                        }
-                                        width: 60
-                                        height: 48
+                                MenuItem {
+                                    text: 'Scroll'
+                                    onClicked: {
+                                        util.setSettingsValue("ui/dragMode", "scroll");
+                                        currentDragMode = "scroll";
+                                        term.clearSelection();
+                                        hideMenu();
                                     }
-                                    Button {
-                                        text: "<font size=\"-1\">Scroll</font>"
-                                        highlighted: currentDragMode=="scroll"
-                                        onClicked: {
-                                            util.setSettingsValue("ui/dragMode", "scroll");
-                                            currentDragMode = "scroll";
-                                            term.clearSelection();
-                                            hideMenu();
-                                        }
-                                        width: 60
-                                        height: 48
-                                    }
-                                    Button {
-                                        text: "<font size=\"-1\">Select</font>"
-                                        highlighted: currentDragMode=="select"
-                                        onClicked: {
-                                            util.setSettingsValue("ui/dragMode", "select");
-                                            currentDragMode = "select";
-                                            hideMenu();
-                                        }
-                                        width: 60
-                                        height: 48
+                                }
+                                MenuItem {
+                                    text: 'Select'
+                                    onClicked: {
+                                        util.setSettingsValue("ui/dragMode", "select");
+                                        currentDragMode = "select";
+                                        hideMenu();
                                     }
                                 }
                             }
                         }
-                        Rectangle {
-                            width: 180
-                            height: 68
-                            radius: 5
-                            color: "#606060"
-                            border.color: "#000000"
-                            border.width: 1
-                            Column {
-                                Text {
-                                    width: 180
-                                    height: 20
-                                    color: "#ffffff"
-                                    font.pointSize: util.uiFontSize()-1;
-                                    text: "VKB behavior"
-                                    horizontalAlignment: Text.AlignHCenter
-                                }
-                                Row {
-                                    Button {
-                                        text: "Off"
-                                        highlighted: currentShowMethod=="off"
-                                        onClicked: {
-                                            util.setSettingsValue("ui/vkbShowMethod", "off");
-                                            currentShowMethod = "off";
-                                            window.setTextRenderAttributes();
-                                            hideMenu();
-                                        }
-                                        width: 60
-                                        height: 48
+
+                        ComboBox {
+                            label: 'VKB behavior'
+                            // TODO: Set selection on load (from currentShowMethod)
+                            menu: ContextMenu {
+                                MenuItem {
+                                    text: 'Off'
+                                    onClicked: {
+                                        util.setSettingsValue("ui/vkbShowMethod", "off");
+                                        currentShowMethod = "off";
+                                        window.setTextRenderAttributes();
+                                        hideMenu();
                                     }
-                                    Button {
-                                        text: "Fade"
-                                        highlighted: currentShowMethod=="fade"
-                                        onClicked: {
+                                }
+                                MenuItem {
+                                    text: 'Fade'
+                                    onClicked: {
                                             util.setSettingsValue("ui/vkbShowMethod", "fade");
                                             currentShowMethod = "fade";
                                             window.setTextRenderAttributes();
                                             hideMenu();
-                                        }
-                                        width: 60
-                                        height: 48
                                     }
-                                    Button {
-                                        text: "Move"
-                                        highlighted: currentShowMethod=="move"
-                                        onClicked: {
+                                }
+                                MenuItem {
+                                    text: 'Move'
+                                    onClicked: {
                                             util.setSettingsValue("ui/vkbShowMethod", "move");
                                             currentShowMethod = "move";
                                             window.setTextRenderAttributes();
                                             hideMenu();
-                                        }
-                                        width: 60
-                                        height: 48
                                     }
                                 }
                             }
                         }
-                        Button {
-                            text: "New window"
-                            onClicked: {
-                                hideMenu();
-                                util.openNewWindow();
-                            }
-                        }
-                        Button {
-                            text: "VKB layout..."
-                            onClicked: {
-                                hideMenu();
-                                layoutWindow.layouts = keyLoader.availableLayouts();
-                                layoutWindow.state = "visible";
-                            }
-                        }
-                        Button {
-                            text: "About"
-                            onClicked: {
-                                hideMenu();
-                                aboutDialog.termW = term.termSize().width
-                                aboutDialog.termH = term.termSize().height
-                                aboutDialog.state = "visible"
-                            }
-                        }
-                        Button {
-                            text: "Minimize"
-                            onClicked: {
-                                hideMenu();
-                                util.windowMinimize();
-                            }
-                        }
-                        Button {
-                            text: "Quit"
-                            onClicked: {
-                                hideMenu();
-                                Qt.quit();
-                            }
-                        }
+
                     }
                 }
                 // VKB delay slider
