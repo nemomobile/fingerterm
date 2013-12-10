@@ -280,61 +280,21 @@ Item {
                             }
                         }
 
-                    }
-                }
-                // VKB delay slider
-                Rectangle {
-                    id: vkbDelaySliderArea
-                    width: menuBlocksRow.width
-                    height: 68
-                    radius: 5
-                    color: "#606060"
-                    border.color: "#000000"
-                    border.width: 1
-                    Text {
-                        width: parent.width
-                        height: 20
-                        color: "#ffffff"
-                        font.pointSize: util.uiFontSize()-1;
-                        text: "VKB delay: " + vkbDelaySlider.keyboardFadeOutDelayLabel + " ms"
-                        horizontalAlignment: Text.AlignHCenter
-                    }
-                    Rectangle {
-                        x: 5
-                        y: vkbDelaySlider.y + vkbDelaySlider.height/2 - height/2
-                        width: menuBlocksRow.width - 10
-                        height: 10
-                        radius: 5
-                        z: 1
-                        color: "#909090"
-                    }
-                    Rectangle {
-                        id: vkbDelaySlider
-                        property int keyboardFadeOutDelayLabel: keyboardFadeOutDelay
-                        x: (keyboardFadeOutDelay-1000)/9000 * (vkbDelaySliderArea.width - vkbDelaySlider.width)
-                        y: 20
-                        width: 60
-                        radius: 15
-                        height: parent.height-20
-                        color: "#202020"
-                        z: 2
-                        onXChanged: {
-                            if (vkbDelaySliderMA.drag.active)
-                                vkbDelaySlider.keyboardFadeOutDelayLabel =
-                                        Math.floor((1000+vkbDelaySlider.x/vkbDelaySliderMA.drag.maximumX*9000)/250)*250;
-                        }
-                        MouseArea {
-                            id: vkbDelaySliderMA
-                            anchors.fill: parent
-                            drag.target: vkbDelaySlider
-                            drag.axis: Drag.XAxis
-                            drag.minimumX: 0
-                            drag.maximumX: vkbDelaySliderArea.width - vkbDelaySlider.width
-                            drag.onActiveChanged: {
-                                if (!drag.active) {
-                                    keyboardFadeOutDelay = vkbDelaySlider.keyboardFadeOutDelayLabel
-                                    util.setSettingsValue("ui/keyboardFadeOutDelay", keyboardFadeOutDelay);
-                                }
+                        Slider {
+                            id: vkbDelaySlider
+                            width: parent.width
+
+                            label: 'VKB fade-out delay'
+                            valueText: '' + Math.floor(value) + ' ms'
+
+                            value: menuWin.keyboardFadeOutDelay
+                            minimumValue: 1000
+                            maximumValue: 10000
+                            stepSize: 250
+
+                            onValueChanged: {
+                                menuWin.keyboardFadeOutDelay = value;
+                                util.setSettingsValue("ui/keyboardFadeOutDelay", value);
                             }
                         }
                     }
