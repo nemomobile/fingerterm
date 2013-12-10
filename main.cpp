@@ -189,11 +189,11 @@ void defaultSettings(QSettings* settings)
     defaults["ui/fontSize"] = 11;
     defaults["ui/keyboardMargins"] = 10;
     defaults["ui/allowSwipe"] = "auto";   // "true", "false", "auto"
-    defaults["ui/keyboardFadeOutDelay"] = 2500;
+    defaults["ui/keyboardFadeOutDelay"] = 4000;
     defaults["ui/showExtraLinesFromCursor"] = 1;
-    defaults["ui/vkbShowMethod"] = "fade";  // "fade", "move", "off"
+    defaults["ui/vkbShowMethod"] = "move";  // "fade", "move", "off"
     defaults["ui/keyPressFeedback"] = true;
-    defaults["ui/dragMode"] = "gestures";  // "gestures, "scroll", "select" ("off" would also be ok)
+    defaults["ui/dragMode"] = "scroll";  // "gestures, "scroll", "select" ("off" would also be ok)
 
     defaults["state/showWelcomeScreen"] = true;
     defaults["state/createdByVersion"] = PROGRAM_VERSION;
