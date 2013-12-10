@@ -173,64 +173,45 @@ int main(int argc, char *argv[])
 
 void defaultSettings(QSettings* settings)
 {
-    if(!settings->contains("ui/orientationLockMode"))
-        settings->setValue("ui/orientationLockMode", "auto");
-    if(!settings->contains("general/execCmd"))
-        settings->setValue("general/execCmd", "");
-    if(!settings->contains("general/visualBell"))
-        settings->setValue("general/visualBell", true);
-    if(!settings->contains("general/backgroundBellNotify"))
-        settings->setValue("general/backgroundBellNotify", true);
-    if(!settings->contains("general/grabUrlsFromBackbuffer"))
-        settings->setValue("general/grabUrlsFromBackbuffer", false);
+    QMap<QString, QVariant> defaults;
 
-    if(!settings->contains("terminal/envVarTERM"))
-        settings->setValue("terminal/envVarTERM", "xterm");
-    if(!settings->contains("terminal/charset"))
-        settings->setValue("terminal/charset", "UTF-8");
+    defaults["ui/orientationLockMode"] = "auto";
+    defaults["general/execCmd"] = "";
+    defaults["general/visualBell"] = true;
+    defaults["general/backgroundBellNotify"] = true;
+    defaults["general/grabUrlsFromBackbuffer"] = false;
 
-    if(!settings->contains("ui/keyboardLayout"))
-        settings->setValue("ui/keyboardLayout", "english");
-    if(!settings->contains("ui/fontFamily"))
-        settings->setValue("ui/fontFamily", "monospace");
-    if(!settings->contains("ui/fontSize"))
-        settings->setValue("ui/fontSize", 11);
-    if(!settings->contains("ui/keyboardMargins"))
-        settings->setValue("ui/keyboardMargins", 10);
-    if(!settings->contains("ui/allowSwipe"))
-        settings->setValue("ui/allowSwipe", "auto");   // "true", "false", "auto"
-    if(!settings->contains("ui/keyboardFadeOutDelay"))
-        settings->setValue("ui/keyboardFadeOutDelay", 2500);
-    if(!settings->contains("ui/showExtraLinesFromCursor"))
-        settings->setValue("ui/showExtraLinesFromCursor", 1);
-    if(!settings->contains("ui/vkbShowMethod"))
-        settings->setValue("ui/vkbShowMethod", "fade");  // "fade", "move", "off"
-    if(!settings->contains("ui/keyPressFeedback"))
-        settings->setValue("ui/keyPressFeedback", true);
-    if(!settings->contains("ui/dragMode"))
-        settings->setValue("ui/dragMode", "gestures");  // "gestures, "scroll", "select" ("off" would also be ok)
+    defaults["terminal/envVarTERM"] = "xterm";
+    defaults["terminal/charset"] = "UTF-8";
 
-    if(!settings->contains("state/showWelcomeScreen"))
-        settings->setValue("state/showWelcomeScreen", true);
-    if(!settings->contains("state/createdByVersion"))
-        settings->setValue("state/createdByVersion", PROGRAM_VERSION);
+    defaults["ui/keyboardLayout"] = "english";
+    defaults["ui/fontFamily"] = "monospace";
+    defaults["ui/fontSize"] = 11;
+    defaults["ui/keyboardMargins"] = 10;
+    defaults["ui/allowSwipe"] = "auto";   // "true", "false", "auto"
+    defaults["ui/keyboardFadeOutDelay"] = 2500;
+    defaults["ui/showExtraLinesFromCursor"] = 1;
+    defaults["ui/vkbShowMethod"] = "fade";  // "fade", "move", "off"
+    defaults["ui/keyPressFeedback"] = true;
+    defaults["ui/dragMode"] = "gestures";  // "gestures, "scroll", "select" ("off" would also be ok)
 
-    if(!settings->contains("gestures/panLeftTitle"))
-        settings->setValue("gestures/panLeftTitle", "Alt-Right");
-    if(!settings->contains("gestures/panLeftCommand"))
-        settings->setValue("gestures/panLeftCommand", "\\e\\e[C");
-    if(!settings->contains("gestures/panRightTitle"))
-        settings->setValue("gestures/panRightTitle", "Alt-Left");
-    if(!settings->contains("gestures/panRightCommand"))
-        settings->setValue("gestures/panRightCommand", "\\e\\e[D");
-    if(!settings->contains("gestures/panUpTitle"))
-        settings->setValue("gestures/panUpTitle", "Page Down");
-    if(!settings->contains("gestures/panUpCommand"))
-        settings->setValue("gestures/panUpCommand", "\\e[6~");
-    if(!settings->contains("gestures/panDownTitle"))
-        settings->setValue("gestures/panDownTitle", "Page Up");
-    if(!settings->contains("gestures/panDownCommand"))
-        settings->setValue("gestures/panDownCommand", "\\e[5~");
+    defaults["state/showWelcomeScreen"] = true;
+    defaults["state/createdByVersion"] = PROGRAM_VERSION;
+
+    defaults["gestures/panLeftTitle"] = "Alt-Right";
+    defaults["gestures/panLeftCommand"] = "\\e\\e[C";
+    defaults["gestures/panRightTitle"] = "Alt-Left";
+    defaults["gestures/panRightCommand"] = "\\e\\e[D";
+    defaults["gestures/panUpTitle"] = "Page Down";
+    defaults["gestures/panUpCommand"] = "\\e[6~";
+    defaults["gestures/panDownTitle"] = "Page Up";
+    defaults["gestures/panDownCommand"] = "\\e[5~";
+
+    foreach (QString key, defaults.keys()) {
+        if (!settings->contains(key)) {
+            settings->setValue(key, defaults.value(key));
+        }
+    }
 }
 
 void copyFilesFromPath(QString from, QString to)
