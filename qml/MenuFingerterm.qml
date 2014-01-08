@@ -94,6 +94,7 @@ Item {
                         pageStack.push('UrlGrabberPage.qml')
                     }
                 }
+                /* Disabled, as QProcess::startDetached() hangs the process
                 MenuItem {
                     text: "New window"
                     onClicked: {
@@ -101,6 +102,7 @@ Item {
                         util.openNewWindow();
                     }
                 }
+                */
             }
 
             VerticalScrollDecorator { flickable: menuFlickArea }
