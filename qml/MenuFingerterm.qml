@@ -79,10 +79,7 @@ Item {
                 MenuItem {
                     text: "About"
                     onClicked: {
-                        hideMenu();
-                        aboutDialog.termW = term.termSize().width
-                        aboutDialog.termH = term.termSize().height
-                        aboutDialog.state = "visible"
+                        pageStack.push('AboutPage.qml')
                     }
                 }
                 MenuItem {

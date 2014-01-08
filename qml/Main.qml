@@ -54,33 +54,6 @@ ApplicationWindow {
         color: bgcolor
 
         NotifyWin {
-            id: aboutDialog
-            property int termW: 0
-            property int termH: 0
-            text: {
-                var str = "<font size=\"+3\">FingerTerm " + util.versionString() + "</font><br>\n" +
-                        "<font size=\"+1\">" +
-                        "by Heikki Holstila &lt;<a href=\"mailto:heikki.holstila@gmail.com?subject=FingerTerm\">heikki.holstila@gmail.com</a>&gt;<br><br>\n\n" +
-                        "Config files for adjusting settings are at:<br>\n" +
-                        util.configPath() + "/<br><br>\n" +
-                        "Documentation:<br>\n<a href=\"http://hqh.unlink.org/harmattan\">http://hqh.unlink.org/harmattan</a>"
-                if (termH != 0 && termW != 0) {
-                    str += "<br><br>Current window title: <font color=\"gray\">" + appWindow.windowTitle.substring(0,40) + "</font>"; //cut long window title
-                    if(appWindow.windowTitle.length>40)
-                        str += "...";
-                    str += "<br>Current terminal size: <font color=\"gray\">" + termW + "x" + termH + "</font>";
-                    str += "<br>Charset: <font color=\"gray\">" + util.settingsValue("terminal/charset") + "</font>";
-                }
-                str += "</font>";
-                return str;
-            }
-            onDismissed: {
-                util.setSettingsValue("state/showWelcomeScreen", false);
-            }
-            z: 1001
-        }
-
-        NotifyWin {
             id: errorDialog
             text: ""
             z: 1002
@@ -407,8 +380,6 @@ ApplicationWindow {
 
         Component.onCompleted: {
             util.updateSwipeLock(vkb.active)
-            if( util.settingsValue("state/showWelcomeScreen") === true )
-                aboutDialog.state = "visible";
         }
 
         function showErrorMessage(string)
@@ -425,8 +396,7 @@ ApplicationWindow {
 
         function updateGesturesAllowed()
         {
-            if(vkb.active || urlWindow.state=="visible" ||
-                    aboutDialog.state=="visible" || layoutWindow.state=="visible")
+            if(vkb.active || urlWindow.state=="visible" || layoutWindow.state=="visible")
                 util.allowGestures = false;
             else
                 util.allowGestures = true;
