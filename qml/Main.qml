@@ -64,12 +64,6 @@ ApplicationWindow {
             z: 1000
         }
 
-        LayoutWindow {
-            id: layoutWindow
-            z: 1000
-        }
-
-
         Lineview {
             id: lineView
             x: 0
@@ -396,7 +390,7 @@ ApplicationWindow {
 
         function updateGesturesAllowed()
         {
-            if(vkb.active || urlWindow.state=="visible" || layoutWindow.state=="visible")
+            if(vkb.active || urlWindow.state=="visible")
                 util.allowGestures = false;
             else
                 util.allowGestures = true;

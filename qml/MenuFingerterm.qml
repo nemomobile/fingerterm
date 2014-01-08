@@ -85,9 +85,7 @@ Item {
                 MenuItem {
                     text: "Keyboard layout"
                     onClicked: {
-                        hideMenu();
-                        layoutWindow.layouts = keyLoader.availableLayouts();
-                        layoutWindow.state = "visible";
+                        pageStack.push('LayoutPage.qml')
                     }
                 }
                 MenuItem {
