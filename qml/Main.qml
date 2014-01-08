@@ -139,30 +139,13 @@ ApplicationWindow {
                     delete multiTouchArea.pressedKeys[touchPoint.pointId];
                 });
             }
-        }
-
-        Rectangle {
-            //top right corner menu button
-            x: window.width - width
-            y: 0
-            z: 1
-            width: menuImg.width + 60
-            height: menuImg.height + 30
-            color: "transparent"
-            opacity: 0.5
-            Image {
-                anchors.centerIn: parent
-                id: menuImg
-                source: "icons/menu.png"
-                height: sourceSize.height
-                width: sourceSize.width
-            }
-            MouseArea {
-                anchors.fill: parent
-                onClicked: {
-                    pageStack.push(menuPage);
-                    menu.showMenu();
-                }
+            onCanceled: {
+                touchPoints.forEach(function (touchPoint) {
+                    if (multiTouchArea.firstTouchId == touchPoint.pointId) {
+                        multiTouchArea.firstTouchId = -1;
+                    }
+                    delete multiTouchArea.pressedKeys[touchPoint.pointId];
+                });
             }
         }
 
@@ -415,5 +398,9 @@ ApplicationWindow {
             id: menu
             anchors.fill: parent
         }
+    }
+
+    Component.onCompleted: {
+        pageStack.pushAttached(menuPage)
     }
 }
