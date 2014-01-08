@@ -135,6 +135,7 @@ Item {
                         }
 
                         Row {
+                            anchors.horizontalCenter: parent.horizontalCenter
                             Button {
                                 text: "Copy"
                                 onClicked: {
@@ -175,6 +176,7 @@ Item {
                             }
                         }
 
+                        /*
                         ComboBox {
                             label: 'UI Orientation'
                             // TODO: Set selection on load (from currentOrientationLockMode)
@@ -287,6 +289,7 @@ Item {
                                 util.setSettingsValue("ui/keyboardFadeOutDelay", value);
                             }
                         }
+                        */
                     }
                 }
             }
