@@ -20,16 +20,7 @@ SOURCES += main.cpp terminal.cpp textrender.cpp \
     util.cpp \
     keyloader.cpp
 
-OTHER_FILES += \
-    qml/Main.qml \
-    qml/Keyboard.qml \
-    qml/Key.qml \
-    qml/Lineview.qml \
-    qml/Button.qml \
-    qml/MenuFingerterm.qml \
-    qml/NotifyWin.qml \
-    qml/UrlWindow.qml \
-    qml/LayoutWindow.qml
+OTHER_FILES += $$files{qml/*}
 
 userdata.files = data
 userdata.path = /usr/share/$${TARGET}

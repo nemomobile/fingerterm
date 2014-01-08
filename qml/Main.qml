@@ -53,12 +53,6 @@ ApplicationWindow {
         objectName: "window"
         color: bgcolor
 
-        NotifyWin {
-            id: errorDialog
-            text: ""
-            z: 1002
-        }
-
         Lineview {
             id: lineView
             x: 0
@@ -371,10 +365,9 @@ ApplicationWindow {
             util.updateSwipeLock(vkb.active)
         }
 
-        function showErrorMessage(string)
+        function showErrorMessage(message)
         {
-            errorDialog.text = "<font size=\"+2\">" + string + "</font>";
-            errorDialog.state = "visible"
+            pageStack.push('MessagePage.qml', {'message': message})
         }
 
         function visualBell()
