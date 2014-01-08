@@ -91,9 +91,7 @@ Item {
                 MenuItem {
                     text: "URL grabber"
                     onClicked: {
-                        hideMenu();
-                        urlWindow.urls = term.grabURLsFromBuffer();
-                        urlWindow.state = "visible";
+                        pageStack.push('UrlGrabberPage.qml')
                     }
                 }
                 MenuItem {
