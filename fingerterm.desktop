@@ -1,6 +1,6 @@
 [Desktop Entry]
 Type=Application
-X-Nemo-Application-Type=no-invoker
+X-Nemo-Application-Type=silica-qt5
 Name=Terminal
 Icon=icon-l-terminal
-Exec=sh -c "exec fingerterm"
+Exec=fingerterm

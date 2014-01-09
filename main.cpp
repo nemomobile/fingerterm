@@ -59,6 +59,7 @@ int main(int argc, char *argv[])
         setenv("TERM", settings->value("terminal/envVarTERM").toByteArray(), 1);
 
         QString execCmd;
+        int loginShell = 0;
         for(int i=0; i<argc-1; i++) {
             if( QString(argv[i]) == "-e" )
                 execCmd = QString(argv[i+1]);
@@ -71,14 +72,22 @@ int main(int argc, char *argv[])
             unsetenv("POSIXLY_CORRECT");
             // execute the user's default shell
             passwd *pwdstruct = getpwuid(getuid());
-            execCmd = QString(pwdstruct->pw_shell);
+            execCmd = QString("exec ");
+            execCmd.append(pwdstruct->pw_shell);
             execCmd.append(" --login");
+            loginShell = 1;
         }
 
         if(settings)
             delete settings; // don't need 'em here
 
-        QStringList execParts = execCmd.split(' ', QString::SkipEmptyParts);
+        QStringList execParts;
+        if(loginShell) {
+            execParts << "sh" << "-c" << execCmd;
+        } else  {
+            execParts = execCmd.split(' ', QString::SkipEmptyParts);
+        }
+
         if(execParts.length()==0)
             exit(0);
         char *ptrs[execParts.length()+1];
