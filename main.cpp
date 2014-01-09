@@ -67,6 +67,8 @@ int main(int argc, char *argv[])
             execCmd = settings->value("general/execCmd").toString();
         }
         if(execCmd.isEmpty()) {
+            // unset $POSIXLY_CORRECT to avoid bash going into restricted mode
+            unsetenv("POSIXLY_CORRECT");
             // execute the user's default shell
             passwd *pwdstruct = getpwuid(getuid());
             execCmd = QString(pwdstruct->pw_shell);
