@@ -53,7 +53,7 @@ Item {
             id: xmlDelegate
             BackgroundItem {
                 width: menuWin.width
-                enabled: disableOn.length === 0 || window.windowTitle.search(disableOn) === -1
+                enabled: disableOn.length === 0 || appWindow.windowTitle.search(disableOn) === -1
                 Label {
                     text: title
                     color: highlighted ? Theme.highlightColor : Theme.primaryColor
