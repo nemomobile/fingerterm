@@ -196,7 +196,7 @@ void defaultSettings(QSettings* settings)
     defaults["terminal/charset"] = "UTF-8";
 
     defaults["ui/keyboardLayout"] = "english";
-    defaults["ui/fontFamily"] = "monospace";
+    defaults["ui/fontFamily"] = "Droid Sans Mono";
     defaults["ui/fontSize"] = 11;
     defaults["ui/keyboardMargins"] = 10;
     defaults["ui/allowSwipe"] = "auto";   // "true", "false", "auto"
