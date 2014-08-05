@@ -141,8 +141,7 @@ void Util::keyReleaseFeedback()
     if( !settingsValue("ui/keyPressFeedback").toBool() )
         return;
 
-    // TODO: check what's more comfortable, only press, or press and release
-    QFeedbackEffect::playThemeEffect(QFeedbackEffect::ReleaseWeak);
+    // No haptic release feedback
 }
 
 void Util::bellAlert()
