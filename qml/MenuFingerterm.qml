@@ -26,7 +26,6 @@ Item {
     property bool enableCopy: false
     property bool enablePaste: false
     property string currentSwipeLocking: util.settingsValue("ui/allowSwipe")
-    property string currentShowMethod: util.settingsValue("ui/vkbShowMethod")
     property string currentDragMode: util.settingsValue("ui/dragMode")
     property string currentOrientationLockMode: util.settingsValue("ui/orientationLockMode")
     property int keyboardFadeOutDelay: util.settingsValue("ui/keyboardFadeOutDelay")
@@ -171,7 +170,6 @@ Item {
 
                             onValueChanged: {
                                 textrender.fontPointSize = Math.floor(value);
-                                lineView.fontPointSize = textrender.fontPointSize;
                                 util.notifyText(term.termSize().width+"x"+term.termSize().height);
                             }
                         }
@@ -233,40 +231,6 @@ Item {
                                         util.setSettingsValue("ui/dragMode", "select");
                                         currentDragMode = "select";
                                         hideMenu();
-                                    }
-                                }
-                            }
-                        }
-
-                        ComboBox {
-                            label: 'VKB behavior'
-                            // TODO: Set selection on load (from currentShowMethod)
-                            menu: ContextMenu {
-                                MenuItem {
-                                    text: 'Off'
-                                    onClicked: {
-                                        util.setSettingsValue("ui/vkbShowMethod", "off");
-                                        currentShowMethod = "off";
-                                        window.setTextRenderAttributes();
-                                        hideMenu();
-                                    }
-                                }
-                                MenuItem {
-                                    text: 'Fade'
-                                    onClicked: {
-                                            util.setSettingsValue("ui/vkbShowMethod", "fade");
-                                            currentShowMethod = "fade";
-                                            window.setTextRenderAttributes();
-                                            hideMenu();
-                                    }
-                                }
-                                MenuItem {
-                                    text: 'Move'
-                                    onClicked: {
-                                            util.setSettingsValue("ui/vkbShowMethod", "move");
-                                            currentShowMethod = "move";
-                                            window.setTextRenderAttributes();
-                                            hideMenu();
                                     }
                                 }
                             }

@@ -200,8 +200,6 @@ void defaultSettings(QSettings* settings)
     defaults["ui/keyboardMargins"] = 10;
     defaults["ui/allowSwipe"] = "auto";   // "true", "false", "auto"
     defaults["ui/keyboardFadeOutDelay"] = 4000;
-    defaults["ui/showExtraLinesFromCursor"] = 1;
-    defaults["ui/vkbShowMethod"] = "move";  // "fade", "move", "off"
     defaults["ui/keyPressFeedback"] = true;
     defaults["ui/dragMode"] = "scroll";  // "gestures, "scroll", "select" ("off" would also be ok)
 

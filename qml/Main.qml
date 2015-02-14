@@ -53,23 +53,10 @@ ApplicationWindow {
         objectName: "window"
         color: bgcolor
 
-        Lineview {
-            id: lineView
-            x: 0
-            y: -(height+1)
-            z: 20
-            property int duration: 0;
-            onFontPointSizeChanged: {
-                lineView.setPosition(vkb.active)
-            }
-        }
-
         Keyboard {
             id: vkb
-            property bool visibleSetting: true
             x: 0
             y: parent.height-vkb.height
-            visible: visibleSetting
         }
 
         // area that handles gestures/select/scroll modes and vkb-keypresses
@@ -178,10 +165,6 @@ ApplicationWindow {
                 NumberAnimation { duration: textrender.duration; easing.type: Easing.InOutQuad }
             }
 
-            onFontSizeChanged: {
-                lineView.fontPointSize = textrender.fontPointSize;
-            }
-
             onCutAfterChanged: {
                 // this property is used in the paint function, so make sure that the element gets
                 // painted with the updated value (might not otherwise happen because of caching)
@@ -271,14 +254,12 @@ ApplicationWindow {
 
         function wakeVKB()
         {
-            if(!vkb.visibleSetting)
+            if(!vkb.visible)
                 return;
 
-            lineView.duration = window.fadeOutTime;
             textrender.duration = window.fadeOutTime;
             fadeTimer.restart();
             vkb.active = true;
-            lineView.setPosition(vkb.active);
             util.updateSwipeLock(!vkb.active);
             setTextRenderAttributes();
             updateGesturesAllowed();
@@ -287,9 +268,7 @@ ApplicationWindow {
         function sleepVKB()
         {
             textrender.duration = window.fadeInTime;
-            lineView.duration = window.fadeInTime;
             vkb.active = false;
-            lineView.setPosition(vkb.active);
             util.updateSwipeLock(!vkb.active);
             setTextRenderAttributes();
             updateGesturesAllowed();
@@ -297,50 +276,25 @@ ApplicationWindow {
 
         function setTextRenderAttributes()
         {
-            if(util.settingsValue("ui/vkbShowMethod")==="move")
-            {
-                vkb.visibleSetting = true;
-                textrender.opacity = 1.0;
-                if(vkb.active) {
-                    var move = textrender.cursorPixelPos().y + textrender.fontHeight/2 + textrender.fontHeight*util.settingsValue("ui/showExtraLinesFromCursor");
-                    if(move < vkb.y) {
-                        textrender.y = 0;
-                        textrender.cutAfter = vkb.y;
-                    } else {
-                        textrender.y = 0 - move + vkb.y
-                        textrender.cutAfter = move;
-                    }
-                } else {
-                    textrender.cutAfter = textrender.height;
+            textrender.opacity = 1.0;
+            if(vkb.active) {
+                var move = textrender.cursorPixelPos().y + textrender.fontHeight * 1.5;
+                if(move < vkb.y) {
                     textrender.y = 0;
+                    textrender.cutAfter = vkb.y;
+                } else {
+                    textrender.y = 0 - move + vkb.y
+                    textrender.cutAfter = move;
                 }
-            }
-            else if(util.settingsValue("ui/vkbShowMethod")==="fade")
-            {
-                vkb.visibleSetting = true;
+            } else {
                 textrender.cutAfter = textrender.height;
                 textrender.y = 0;
-                if(vkb.active)
-                    textrender.opacity = 0.3;
-                else
-                    textrender.opacity = 1.0;
-            }
-            else // "off" (vkb disabled)
-            {
-                vkb.visibleSetting = false;
-                textrender.cutAfter = textrender.height;
-                textrender.y = 0;
-                textrender.opacity = 1.0;
             }
         }
 
         function displayBufferChanged()
         {
-            lineView.lines = term.printableLinesFromCursor(util.settingsValue("ui/showExtraLinesFromCursor"));
             appWindow.lines = term.printableLinesFromCursor(30);
-            lineView.cursorX = textrender.cursorPixelPos().x;
-            lineView.cursorWidth = textrender.cursorPixelSize().width;
-            lineView.cursorHeight = textrender.cursorPixelSize().height;
             setTextRenderAttributes();
         }
 
