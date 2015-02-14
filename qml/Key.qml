@@ -130,11 +130,7 @@ Rectangle {
             key.becomesSticky = true;
             keyboard.currentStickyPressed = key;
         } else {
-            if (keyboard.currentStickyPressed != null) {
-                // Pressing a non-sticky key while a sticky key is pressed:
-                // the sticky key will not become sticky when released
-                keyboard.currentStickyPressed.becomesSticky = false;
-            }
+            keyboard.nonStickyKeyPressed();
         }
     }
 

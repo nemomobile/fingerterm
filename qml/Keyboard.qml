@@ -37,12 +37,20 @@ Rectangle {
     property string keyHilightBgColor: Theme.secondaryColor
     property string keyBorderColor: '#66ffffff'
 
-    property bool active: false
+    property bool active: true
 
     property int outmargins: util.settingsValue("ui/keyboardMargins")
     property int keyspacing: 6
     property int keysPerRow: keyLoader.vkbColumns()
     property real keywidth: (keyboard.width - keyspacing*keysPerRow - outmargins*2)/keysPerRow;
+
+    function nonStickyKeyPressed() {
+        if (currentStickyPressed != null) {
+            // Pressing a non-sticky key while a sticky key is pressed:
+            // the sticky key will not become sticky when released
+            currentStickyPressed.becomesSticky = false;
+        }
+    }
 
     Component {
         id: keyboardContents
@@ -100,13 +108,8 @@ Rectangle {
     {
         var ret = keyLoader.loadLayout(util.settingsValue("ui/keyboardLayout"));
         if (!ret) {
-            showErrorMessage("There was an error loading the keyboard layout.<br>\nUsing the default one instead.");
-            util.setSettingsValue("ui/keyboardLayout", "english");
-            ret = keyLoader.loadLayout(":/data/english.layout"); //try the default as a fallback (load from resources to ensure it will succeed)
-            if (!ret) {
-                console.log("keyboard layout fail");
-                Qt.quit();
-            }
+            console.log("keyboard layout fail");
+            Qt.quit();
         }
         // makes the keyboard component reload itself with new data
         keyboardLoader.sourceComponent = undefined

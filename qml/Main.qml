@@ -27,7 +27,7 @@ ApplicationWindow {
     property variant lines: []
 
     Keys.onPressed: {
-        window.vkbKeypress(event.key,event.modifiers);
+        window.vkbKeypress(event.key, event.modifiers);
     }
 
     cover: Qt.resolvedUrl("Cover.qml")
@@ -55,8 +55,18 @@ ApplicationWindow {
 
         Keyboard {
             id: vkb
-            x: 0
-            y: parent.height-vkb.height
+            anchors {
+                left: parent.left
+                right: parent.right
+                bottom: parent.bottom
+            }
+            visible: Qt.inputMethod.visible
+
+            function resetStickyByInputMethod() {
+                if (vkb.resetSticky != 0) {
+                    vkb.resetSticky.setStickiness(0);
+                }
+            }
         }
 
         // area that handles gestures/select/scroll modes and vkb-keypresses
@@ -67,6 +77,23 @@ ApplicationWindow {
             property int firstTouchId: -1
             property var pressedKeys: ({})
 
+            Timer {
+                id: showInputMethodTimer
+                interval: 100
+
+                function queue() {
+                    if (!Qt.inputMethod.visible) {
+                        dummyTextField.focus = false;
+                        start();
+                    }
+                }
+
+                onTriggered: {
+                    dummyTextField.focus = true;
+                    Qt.inputMethod.show();
+                }
+            }
+
             onPressed: {
                 touchPoints.forEach(function (touchPoint) {
                     if (multiTouchArea.firstTouchId == -1) {
@@ -74,6 +101,9 @@ ApplicationWindow {
 
                         //gestures c++ handler
                         util.mousePress(touchPoint.x, touchPoint.y);
+
+                        // Always show input when touching first
+                        showInputMethodTimer.queue();
                     }
 
                     var key = vkb.keyAt(touchPoint.x, touchPoint.y);
@@ -101,19 +131,6 @@ ApplicationWindow {
             onReleased: {
                 touchPoints.forEach(function (touchPoint) {
                     if (multiTouchArea.firstTouchId == touchPoint.pointId) {
-                        // Toggle keyboard wake-up when tapping outside the keyboard, but:
-                        //   - only when not scrolling (y-diff < 20 pixels)
-                        //   - not in select mode, as it would be hard to select text
-                        if (touchPoint.y < vkb.y && touchPoint.startY < vkb.y &&
-                                Math.abs(touchPoint.y - touchPoint.startY) < 20 &&
-                                util.settingsValue("ui/dragMode") !== "select") {
-                            if (vkb.active) {
-                                window.sleepVKB();
-                            } else {
-                                window.wakeVKB();
-                            }
-                        }
-
                         //gestures c++ handler
                         util.mouseRelease(touchPoint.x, touchPoint.y);
                         multiTouchArea.firstTouchId = -1;
@@ -148,10 +165,14 @@ ApplicationWindow {
         TextRender {
             id: textrender
             objectName: "textrender"
-            x: 0
-            y: 0
-            height: parent.height
-            width: parent.width
+
+            anchors {
+                left: parent.left
+                right: parent.right
+                top: parent.top
+                bottom: vkb.visible ? vkb.top : parent.bottom
+            }
+
             myWidth: width
             myHeight: height
             opacity: 1.0
@@ -172,16 +193,6 @@ ApplicationWindow {
             }
 
             z: 10
-        }
-
-        Timer {
-            id: fadeTimer
-            running: false
-            repeat: false
-            interval: menu.keyboardFadeOutDelay
-            onTriggered: {
-                window.sleepVKB();
-            }
         }
 
         Timer {
@@ -247,6 +258,43 @@ ApplicationWindow {
             }
         }
 
+        TextInput {
+            id: dummyTextField
+
+            inputMethodHints: Qt.ImhNoAutoUppercase | Qt.ImhNoPredictiveText
+
+            width: 30
+            height: 30
+            y: -height
+            focus: true
+
+            onTextChanged: {
+                var i, ch, mod;
+
+                if (text !== '') {
+                    for (i=0; i<text.length; i++) {
+                        ch = text[i];
+                        mod = (ch === ch.toUpperCase()) ? 0x2000000 : 0;
+                        term.keyPress(ch.toLowerCase().charCodeAt(i), mod | vkb.keyModifiers);
+                    }
+
+                    text = '';
+                    focus = true;
+                    vkb.resetStickyByInputMethod();
+                }
+            }
+
+            Keys.onPressed: {
+                event.accepted = true
+            }
+
+            Keys.onReleased: {
+                term.keyPress(event.key,event.modifiers | vkb.keyModifiers);
+                //vkb.resetStickyByInputMethod();
+                event.accepted = true
+            }
+        }
+
         function vkbKeypress(key,modifiers) {
             wakeVKB();
             term.keyPress(key,modifiers);
@@ -254,12 +302,7 @@ ApplicationWindow {
 
         function wakeVKB()
         {
-            if(!vkb.visible)
-                return;
-
             textrender.duration = window.fadeOutTime;
-            fadeTimer.restart();
-            vkb.active = true;
             util.updateSwipeLock(!vkb.active);
             setTextRenderAttributes();
             updateGesturesAllowed();
@@ -268,7 +311,6 @@ ApplicationWindow {
         function sleepVKB()
         {
             textrender.duration = window.fadeInTime;
-            vkb.active = false;
             util.updateSwipeLock(!vkb.active);
             setTextRenderAttributes();
             updateGesturesAllowed();
@@ -277,19 +319,8 @@ ApplicationWindow {
         function setTextRenderAttributes()
         {
             textrender.opacity = 1.0;
-            if(vkb.active) {
-                var move = textrender.cursorPixelPos().y + textrender.fontHeight * 1.5;
-                if(move < vkb.y) {
-                    textrender.y = 0;
-                    textrender.cutAfter = vkb.y;
-                } else {
-                    textrender.y = 0 - move + vkb.y
-                    textrender.cutAfter = move;
-                }
-            } else {
-                textrender.cutAfter = textrender.height;
-                textrender.y = 0;
-            }
+            textrender.cutAfter = textrender.height;
+            textrender.y = 0;
         }
 
         function displayBufferChanged()

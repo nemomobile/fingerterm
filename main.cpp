@@ -128,10 +128,10 @@ int main(int argc, char *argv[])
     keyLoader.setUtil(&util);
     bool ret = keyLoader.loadLayout( settings->value("ui/keyboardLayout").toString() );
     if(!ret) {
-        // on failure, try to load the default one (english) directly from resources
+        // on failure, try to load the default one (shell)
         startupErrorMsg = "There was an error loading the keyboard layout.<br>\nUsing the default one instead.";
-        settings->setValue("ui/keyboardLayout", "english");
-        ret = keyLoader.loadLayout(":/data/english.layout");
+        settings->setValue("ui/keyboardLayout", "shell");
+        ret = keyLoader.loadLayout(SailfishApp::pathTo("data/shell.layout").toLocalFile());
         if(!ret)
             qFatal("failure loading keyboard layout");
     }
@@ -195,7 +195,7 @@ void defaultSettings(QSettings* settings)
     defaults["terminal/envVarTERM"] = "xterm";
     defaults["terminal/charset"] = "UTF-8";
 
-    defaults["ui/keyboardLayout"] = "english";
+    defaults["ui/keyboardLayout"] = "shell";
     defaults["ui/fontSize"] = 11;
     defaults["ui/keyboardMargins"] = 10;
     defaults["ui/allowSwipe"] = "auto";   // "true", "false", "auto"
