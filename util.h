@@ -22,6 +22,8 @@
 
 #include <QtCore>
 
+#include "fingerterm.h"
+
 class Terminal;
 class TextRender;
 class QQuickView;
@@ -65,6 +67,9 @@ public:
 
     Q_PROPERTY(bool allowGestures READ allowGestures WRITE setAllowGestures NOTIFY allowGesturesChanged)
 
+    QString fontFamily() { return FINGERTERM_FONT; }
+    Q_PROPERTY(QString fontFamily READ fontFamily NOTIFY fontFamilyChanged)
+
     static bool charIsHexDigit(QChar ch);
 
 public slots:
@@ -78,6 +83,7 @@ signals:
     void gestureNotify(QString msg);
     void clipboardOrSelectionChanged();
     void windowTitleChanged();
+    void fontFamilyChanged();
 
 private:
     Q_DISABLE_COPY(Util)

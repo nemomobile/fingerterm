@@ -31,7 +31,7 @@ CoverBackground {
         }
 
         font {
-            family: util.settingsValue("ui/fontFamily")
+            family: util.fontFamily
             pixelSize: Theme.fontSizeTiny / 2
         }
 

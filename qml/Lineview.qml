@@ -39,7 +39,7 @@ Rectangle {
         id: fontHeightHack
         visible: false
         text: "X"
-        font.family: util.settingsValue("ui/fontFamily");
+        font.family: util.fontFamily
         font.pointSize: lineView.fontPointSize
     }
 
@@ -70,7 +70,7 @@ Rectangle {
                 color: "transparent"
                 Text {
                     color: "#ffffff"
-                    font.family: util.settingsValue("ui/fontFamily");
+                    font.family: util.fontFamily
                     font.pointSize: lineView.fontPointSize
                     text: modelData
                     textFormat: Text.PlainText

@@ -21,6 +21,7 @@
 #include "textrender.h"
 #include "terminal.h"
 #include "util.h"
+#include "fingerterm.h"
 
 TextRender::TextRender(QQuickItem *parent) :
     QQuickPaintedItem(parent),
@@ -274,8 +275,7 @@ void TextRender::setTerminal(Terminal *term)
 
     iTerm = term;
 
-    iFont = QFont(iUtil->settingsValue("ui/fontFamily").toString(),
-                  iUtil->settingsValue("ui/fontSize").toInt());
+    iFont = QFont(FINGERTERM_FONT, iUtil->settingsValue("ui/fontSize").toInt());
     iFont.setBold(false);
     QFontMetrics fontMetrics(iFont);
     iFontHeight = fontMetrics.height();
