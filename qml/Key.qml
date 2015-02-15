@@ -51,7 +51,9 @@ Rectangle {
         id: keyImage
         anchors.centerIn: parent
         opacity: key.labelOpacity
-        source: { if(key.label.length>1 && key.label.charAt(0)==':') return "icons/"+key.label.substring(1)+".png"; else return ""; }
+
+        property var images: ['backspace', 'down', 'enter', 'left', 'right', 'shift', 'tab', 'up']
+        source: (images.indexOf(key.label) !== -1) ? ('icons/' + key.label + '.png') : ''
     }
 
     Column {

@@ -124,14 +124,13 @@ int main(int argc, char *argv[])
     // copy the default config files to the config dir if they don't already exist
     copyFilesFromPath(SailfishApp::pathTo("data").toLocalFile(), util.configPath());
 
-    KeyLoader keyLoader;
-    keyLoader.setUtil(&util);
+    KeyLoader keyLoader(&util);
     bool ret = keyLoader.loadLayout( settings->value("ui/keyboardLayout").toString() );
     if(!ret) {
         // on failure, try to load the default one (shell)
         startupErrorMsg = "There was an error loading the keyboard layout.<br>\nUsing the default one instead.";
-        settings->setValue("ui/keyboardLayout", "shell");
-        ret = keyLoader.loadLayout(SailfishApp::pathTo("data/shell.layout").toLocalFile());
+        qDebug() << "Loading fallback toolbar layout";
+        ret = keyLoader.loadDefaultLayout();
         if(!ret)
             qFatal("failure loading keyboard layout");
     }

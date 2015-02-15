@@ -5,6 +5,7 @@ DEPENDPATH += .
 INCLUDEPATH += .
 LIBS += -lutil
 
+CONFIG += c++11
 CONFIG += sailfishapp
 
 HEADERS += \
