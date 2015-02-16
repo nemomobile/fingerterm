@@ -263,6 +263,7 @@ void Util::doGesture(Util::PanGesture gesture)
 
 void Util::notifyText(QString text)
 {
+    // TODO: Not used by QML at the moment
     emit gestureNotify(text);
 }
 

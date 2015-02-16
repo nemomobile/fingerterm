@@ -20,29 +20,22 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 
-Rectangle {
+Item {
     id: keyboard
-    color: "transparent"
 
     width: parent.width
-    height: childrenRect.height + outmargins
+    height: Theme.itemSizeSmall
 
     property int keyModifiers: 0
     property variant resetSticky: 0
     property variant currentStickyPressed: null
     property variant currentKeyPressed: 0
 
-    property string keyFgColor: Theme.primaryColor
-    property string keyBgColor: "#66000000"
-    property string keyHilightBgColor: Theme.secondaryColor
-    property string keyBorderColor: '#66ffffff'
-
     property bool active: true
 
-    property int outmargins: util.settingsValue("ui/keyboardMargins")
     property int keyspacing: 6
     property int keysPerRow: keyLoader.vkbColumns()
-    property real keywidth: (keyboard.width - keyspacing*keysPerRow - outmargins*2)/keysPerRow;
+    property real keywidth: (keyboard.width - keyspacing*keysPerRow)/keysPerRow
 
     function nonStickyKeyPressed() {
         if (currentStickyPressed != null) {
@@ -52,12 +45,20 @@ Rectangle {
         }
     }
 
+    Rectangle {
+        id: background
+        anchors.fill: parent
+        color: Theme.highlightBackgroundColor
+        opacity: 0.15
+    }
+
     Component {
         id: keyboardContents
         Column {
             id: col
             x: (keyboard.width-width)/2
             spacing: keyboard.keyspacing
+            Item { height: 1; width: 1 }
             Repeater {
                 id: rowRepeater
                 model: keyLoader.vkbRows()
@@ -88,20 +89,6 @@ Rectangle {
 
     Component.onCompleted: {
         keyboardLoader.sourceComponent = keyboardContents;
-    }
-
-    onCurrentKeyPressedChanged: {
-        if(currentKeyPressed != 0 && currentKeyPressed.currentLabel.length === 1 && currentKeyPressed.currentLabel !== " ") {
-            visualKeyFeedbackRect.label = currentKeyPressed.currentLabel
-            visualKeyFeedbackRect.width = currentKeyPressed.width*1.5
-            visualKeyFeedbackRect.height = currentKeyPressed.height*1.5
-            var mappedCoord = window.mapFromItem(currentKeyPressed, 0, 0);
-            visualKeyFeedbackRect.x = mappedCoord.x - (visualKeyFeedbackRect.width-currentKeyPressed.width)/2
-            visualKeyFeedbackRect.y = mappedCoord.y - currentKeyPressed.height*1.5
-            visualKeyFeedbackRect.visible = true;
-        } else {
-            visualKeyFeedbackRect.visible = false;
-        }
     }
 
     function reloadLayout()

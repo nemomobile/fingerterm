@@ -52,9 +52,8 @@ static const KeyDef KEYCODES[] = {
     { "pgdn", Qt::Key_PageDown, false },
 };
 
-static const char *DEFAULT_KEY_LAYOUT[2][8] = {
-    { "esc",   "tab",  "<|>", "[|]", "\"|_", "up",   "$|%",   "pgup|home" },
-    { "shift", "ctrl", "alt", "||~", "left", "down", "right", "pgdn|end" },
+static const char *DEFAULT_KEY_LAYOUT[1][8] = {
+    { "tab", "ctrl", "esc", "up", "down", "left", "right", "alt" },
 };
 
 static KeyData parseKey(const QString &label)

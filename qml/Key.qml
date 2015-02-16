@@ -18,6 +18,7 @@
 */
 
 import QtQuick 2.0
+import Sailfish.Silica 1.0
 
 Rectangle {
     id: key
@@ -39,78 +40,47 @@ Rectangle {
     property int pressMouseX: 0
 
     width: window.width/12   // some default
-    height: window.height/8 < 55 ? window.height/8 : 55
-    color: label=="" ? "transparent" : keyboard.keyBgColor
-    border.color: (!keyboard.active || label=="") ? "transparent" : keyboard.keyBorderColor
-    border.width: 1
-    radius: 5
+    height: Theme.itemSizeSmall
+
+    color: (keyboard.currentKeyPressed === key) ? Theme.secondaryHighlightColor : 'transparent'
 
     property bool shiftActive: (keyboard.keyModifiers & Qt.ShiftModifier) && !sticky
 
     Image {
-        id: keyImage
-        anchors.centerIn: parent
-        opacity: key.labelOpacity
+        anchors.right: parent.right
+        // FIXME: Don't hardcode the full path here
+        source: '/usr/share/maliit/plugins/com/jolla/graphic-keyboard-highlight-top.png'
+    }
 
-        property var images: ['backspace', 'down', 'enter', 'left', 'right', 'shift', 'tab', 'up']
+    Image {
+        id: keyIcon
+        anchors.centerIn: parent
+
+        property var images: (['backspace', 'down', 'enter', 'left', 'right', 'shift', 'tab', 'up'])
         source: (images.indexOf(key.label) !== -1) ? ('icons/' + key.label + '.png') : ''
     }
 
-    Column {
-        visible: keyImage.source == ""
+    Label {
+        id: keyLabel
         anchors.centerIn: parent
-        spacing: -17
+        font.pixelSize: Theme.fontSizeSmall
 
-        Text {
-            id: keyAltLabel
-            property bool highlighted: key.shiftActive
-
-            anchors.horizontalCenter: parent.horizontalCenter
-
-            text: key.label_alt
-            color: keyboard.keyFgColor
-
-            opacity: key.labelOpacity * (highlighted ? 1.0 : 0.2)
-            Behavior on opacity { NumberAnimation { duration: 100 } }
-
-            font.pointSize: (highlighted ? 24 : 14) * (text.length > 1 ? 0.5 : 1.0)
-            Behavior on font.pointSize { NumberAnimation { duration: 100 } }
-        }
-
-        Text {
-            id: keyLabel
-            property bool highlighted: key.label_alt == '' || !key.shiftActive
-
-            anchors.horizontalCenter: parent.horizontalCenter
-
-            text: {
-                if (key.label.length == 1 && key.label_alt == '') {
-                    if (key.shiftActive) {
-                        return key.label.toUpperCase();
-                    } else {
-                        return key.label.toLowerCase();
-                    }
-                }
-
-                return key.label;
+        // FIXME: Once we have a font that has nice glyphs for these, get rid if the image above
+        property var icons: ({tab: '↹', up: '↑', down: '↓', left: '←', right: '→'})
+        text: {
+            if (keyIcon.images.indexOf(key.label) === -1 && key.label.length > 0) {
+                return key.label.charAt(0).toUpperCase() + key.label.substr(1)
+            } else {
+                return ''
             }
-
-            color: keyboard.keyFgColor
-
-            opacity: key.labelOpacity * (highlighted ? 1.0 : 0.2)
-            Behavior on opacity { NumberAnimation { duration: 100 } }
-
-            font.pointSize: (highlighted ? 24 : 14) * (text.length > 1 ? 0.5 : 1.0)
-            Behavior on font.pointSize { NumberAnimation { duration: 100 } }
         }
     }
 
     Rectangle {
         id: stickIndicator
         visible: sticky && stickiness>0
-        color: keyboard.keyHilightBgColor
+        color: Theme.primaryColor
         anchors.fill: parent
-        radius: key.radius
         opacity: 0.5
         z: 1
         anchors.topMargin: key.height/2
@@ -121,7 +91,6 @@ Rectangle {
         pressMouseX = x;
         pressMouseY = y;
 
-        key.color = keyboard.keyHilightBgColor
         keyboard.currentKeyPressed = key;
         util.keyPressFeedback();
 
@@ -155,7 +124,6 @@ Rectangle {
     function handleRelease(touchArea, x, y) {
         keyRepeatStarter.stop();
         keyRepeatTimer.stop();
-        key.color = keyboard.keyBgColor;
         keyboard.currentKeyPressed = 0;
 
         if (sticky && !becomesSticky) {

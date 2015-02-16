@@ -38,20 +38,24 @@ ApplicationWindow {
         //orientationLock: window.getOrientationLockMode()
         allowedOrientations: Orientation.All
 
-        Rectangle {
-        property string fgcolor: "black"
-        property string bgcolor: "#88000000"
+        Item {
+            Rectangle {
+                id: background
+                anchors.fill: textrender
+                color: 'black'
+                opacity: bellTimer.running ? 0 : 0.5
+                Behavior on opacity { PropertyAnimation { duration: 20 } }
+            }
+
         property int fontSize: 14
 
         property int fadeOutTime: 80
         property int fadeInTime: 350
 
-
         anchors.fill: parent
 
         id: window
         objectName: "window"
-        color: bgcolor
 
         Keyboard {
             id: vkb
@@ -200,9 +204,6 @@ ApplicationWindow {
             running: false
             repeat: false
             interval: 80
-            onTriggered: {
-                window.color = window.bgcolor;
-            }
         }
 
         Connections {
@@ -210,51 +211,8 @@ ApplicationWindow {
             onVisualBell: {
                 window.visualBell();
             }
-            onGestureNotify: {
-                textNotify.text = msg;
-                textNotifyAnim.enabled = false;
-                textNotify.opacity = 1.0;
-                textNotifyAnim.enabled = true;
-                textNotify.opacity = 0;
-            }
             onWindowTitleChanged: {
                 appWindow.windowTitle = util.currentWindowTitle()
-            }
-        }
-
-        Text {
-            // shows large text notification in the middle of the screen (for gestures)
-            id: textNotify
-            anchors.centerIn: parent
-            color: "#ffffff"
-            z: 100
-            opacity: 0
-            text: ""
-            font.pointSize: 40
-            Behavior on opacity {
-                id: textNotifyAnim
-                NumberAnimation { duration: 500; }
-            }
-        }
-
-        Rectangle {
-            // visual key press feedback...
-            // easier to work with the coordinates if it's here and not under keyboard element
-            id: visualKeyFeedbackRect
-            visible: false
-            x: 0
-            y: 0
-            z: 200
-            width: 0
-            height: 0
-            radius: 5
-            color: Theme.highlightColor
-            property string label: ""
-            Text {
-                color: Theme.primaryColor
-                font.pointSize: 34
-                anchors.centerIn: parent
-                text: visualKeyFeedbackRect.label
             }
         }
 
@@ -341,7 +299,6 @@ ApplicationWindow {
         function visualBell()
         {
             bellTimer.start();
-            window.color = "#ffffff"
         }
 
         function updateGesturesAllowed()
