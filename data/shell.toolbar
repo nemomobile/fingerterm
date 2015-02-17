@@ -1,5 +1,0 @@
-# Shell Toolbar Layout
-# 1. Each line is a row in the toolbar
-# 2. Keys are separated by one or more space
-# 3. Shifted alternatives to keys separated by |
-tab ctrl esc up down left right alt

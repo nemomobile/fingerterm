@@ -42,7 +42,6 @@ public:
 
     Q_INVOKABLE void windowMinimize();
     Q_INVOKABLE void openNewWindow();
-    Q_INVOKABLE void updateSwipeLock(bool suggestedState);
 
     Q_INVOKABLE QString versionString();
     Q_INVOKABLE QString configPath();
@@ -51,8 +50,6 @@ public:
 
     Q_INVOKABLE int uiFontSize();
 
-    Q_INVOKABLE void keyPressFeedback();
-    Q_INVOKABLE void keyReleaseFeedback();
     Q_INVOKABLE void notifyText(QString text);
 
     Q_INVOKABLE void copyTextToClipboard(QString str);
@@ -88,11 +85,6 @@ signals:
 private:
     Q_DISABLE_COPY(Util)
     enum PanGesture { PanNone, PanLeft, PanRight, PanUp, PanDown };
-
-    void enableSwipe();
-    void disableSwipe();
-    bool swipeModeSet;
-    bool swipeAllowed;
 
     void scrollBackBuffer(QPointF now, QPointF last);
     void doGesture(PanGesture gesture);

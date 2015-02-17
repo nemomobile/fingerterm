@@ -196,6 +196,11 @@ bool KeyLoader::loadDefaultLayout()
         iKeyData.append(keyRow);
     }
 
+    for (const QList<KeyData> &r: iKeyData) {
+        iVkbColumns = qMax(r.count(), iVkbColumns);
+    }
+    iVkbRows = iKeyData.count();
+
     return true;
 }
 

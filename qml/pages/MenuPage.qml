@@ -18,16 +18,13 @@
 */
 
 import QtQuick 2.0
-import QtQuick.XmlListModel 2.0
 import Sailfish.Silica 1.0
 
-Item {
+Page {
     id: menuWin
     property bool enableCopy: false
     property bool enablePaste: false
-    property string currentSwipeLocking: util.settingsValue("ui/allowSwipe")
     property string currentDragMode: util.settingsValue("ui/dragMode")
-    property string currentOrientationLockMode: util.settingsValue("ui/orientationLockMode")
     property int keyboardFadeOutDelay: util.settingsValue("ui/keyboardFadeOutDelay")
 
     Item {
@@ -37,37 +34,6 @@ Item {
             horizontalCenter: parent.horizontalCenter
         }
         width: flickableContent.width
-
-        XmlListModel {
-            id: xmlModel
-            xml: term.getUserMenuXml()
-            query: "/userMenu/item"
-
-            XmlRole { name: "title"; query: "title/string()" }
-            XmlRole { name: "command"; query: "command/string()" }
-            XmlRole { name: "disableOn"; query: "disableOn/string()" }
-        }
-
-        Component {
-            id: xmlDelegate
-            BackgroundItem {
-                width: menuWin.width
-                enabled: disableOn.length === 0 || appWindow.windowTitle.search(disableOn) === -1
-                Label {
-                    text: title
-                    color: highlighted ? Theme.highlightColor : Theme.primaryColor
-                    anchors {
-                        verticalCenter: parent.verticalCenter
-                        left: parent.left
-                        leftMargin: Theme.paddingMedium
-                    }
-                }
-                onClicked: {
-                    hideMenu();
-                    term.putString(command, true);
-                }
-            }
-        }
 
         SilicaFlickable {
             id: menuFlickArea
@@ -79,12 +45,6 @@ Item {
                     text: "About"
                     onClicked: {
                         pageStack.push('AboutPage.qml')
-                    }
-                }
-                MenuItem {
-                    text: "Keyboard layout"
-                    onClicked: {
-                        pageStack.push('LayoutPage.qml')
                     }
                 }
                 MenuItem {
@@ -119,15 +79,6 @@ Item {
                     Column {
                         spacing: 12
                         width: menuWin.width
-
-                        PageHeader {
-                            title: 'Shortcuts'
-                        }
-
-                        Repeater {
-                            model: xmlModel
-                            delegate: xmlDelegate
-                        }
 
                         PageHeader {
                             title: 'Clipboard'
@@ -175,34 +126,6 @@ Item {
                         }
 
                         /*
-                        ComboBox {
-                            label: 'UI Orientation'
-                            // TODO: Set selection on load (from currentOrientationLockMode)
-                            menu: ContextMenu {
-                                MenuItem {
-                                    text: 'Auto'
-                                    onClicked: {
-                                        currentOrientationLockMode = "auto";
-                                        window.setOrientationLockMode("auto");
-                                    }
-                                }
-                                MenuItem {
-                                    text: 'Landscape'
-                                    onClicked: {
-                                        currentOrientationLockMode = "landscape";
-                                        window.setOrientationLockMode("landscape");
-                                    }
-                                }
-                                MenuItem {
-                                    text: 'Portrait'
-                                    onClicked: {
-                                        currentOrientationLockMode = "portrait";
-                                        window.setOrientationLockMode("portrait");
-                                    }
-                                }
-                            }
-                        }
-
                         ComboBox {
                             label: 'Drag mode'
                             // TODO: Set selection on load (from currentDragMode)
@@ -277,12 +200,5 @@ Item {
     function hideMenu()
     {
         pageStack.pop();
-    }
-
-    function changeSwipeLocking(state)
-    {
-        currentSwipeLocking = state
-        util.setSettingsValue("ui/allowSwipe", state)
-        util.updateSwipeLock(!vkb.active);
     }
 }

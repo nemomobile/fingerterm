@@ -21,7 +21,6 @@
 
 #include <QtCore>
 #include <QtGui>
-#include <QDBusInterface>
 #include <QGuiApplication>
 #include <QQuickView>
 #include <QDebug>
@@ -29,9 +28,7 @@
 #include "terminal.h"
 #include "util.h"
 #include "textrender.h"
-#include "version.h"
 
-#include <QFeedbackEffect>
 
 Util::Util(QSettings *settings, QObject *parent) :
     QObject(parent),
@@ -41,9 +38,6 @@ Util::Util(QSettings *settings, QObject *parent) :
     iWindow(0),
     iRenderer(0)
 {
-    swipeModeSet = false;
-    swipeAllowed = true;
-
     connect(QGuiApplication::clipboard(), SIGNAL(dataChanged()), this, SIGNAL(clipboardOrSelectionChanged()));
 }
 
@@ -82,19 +76,6 @@ void Util::openNewWindow()
     QProcess::startDetached("/usr/bin/fingerterm");
 }
 
-void Util::updateSwipeLock(bool suggestedState)
-{
-    Q_UNUSED(suggestedState)
-}
-
-void Util::disableSwipe()
-{
-}
-
-void Util::enableSwipe()
-{
-}
-
 QString Util::configPath()
 {
     if(!iSettings)
@@ -120,7 +101,11 @@ void Util::setSettingsValue(QString key, QVariant value)
 
 QString Util::versionString()
 {
-    return PROGRAM_VERSION;
+#if defined(VERSION)
+    return VERSION;
+#else
+    return "git";
+#endif
 }
 
 int Util::uiFontSize()
@@ -128,30 +113,9 @@ int Util::uiFontSize()
     return 12;
 }
 
-void Util::keyPressFeedback()
-{
-    if( !settingsValue("ui/keyPressFeedback").toBool() )
-        return;
-
-    QFeedbackEffect::playThemeEffect(QFeedbackEffect::PressWeak);
-}
-
-void Util::keyReleaseFeedback()
-{
-    if( !settingsValue("ui/keyPressFeedback").toBool() )
-        return;
-
-    // TODO: check what's more comfortable, only press, or press and release
-    QFeedbackEffect::playThemeEffect(QFeedbackEffect::ReleaseWeak);
-}
-
 void Util::bellAlert()
 {
-    if(!iWindow)
-        return;
-
-    if( settingsValue("general/visualBell").toBool() )
-        emit visualBell();
+    emit visualBell();
 }
 
 void Util::clearNotifications()

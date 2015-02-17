@@ -92,7 +92,7 @@ Rectangle {
         pressMouseY = y;
 
         keyboard.currentKeyPressed = key;
-        util.keyPressFeedback();
+        //util.keyPressFeedback();
 
         keyRepeatStarter.start();
 
@@ -132,7 +132,7 @@ Rectangle {
         }
 
         if (vkb.keyAt(x, y) == key) {
-            util.keyReleaseFeedback();
+            //util.keyReleaseFeedback();
 
             if (key.sticky && key.becomesSticky) {
                 setStickiness(-1);

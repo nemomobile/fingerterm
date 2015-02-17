@@ -21,6 +21,7 @@ import QtQuick 2.0
 import TextRender 1.0
 import Sailfish.Silica 1.0
 
+
 ApplicationWindow {
     id: appWindow
     property string windowTitle: util.currentWindowTitle()
@@ -35,7 +36,6 @@ ApplicationWindow {
     initialPage: Page {
         id: page
 
-        //orientationLock: window.getOrientationLockMode()
         allowedOrientations: Orientation.All
 
         Item {
@@ -157,15 +157,6 @@ ApplicationWindow {
             }
         }
 
-        Image {
-            // terminal buffer scroll indicator
-            source: "icons/scroll-indicator.png"
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.bottom: parent.bottom
-            visible: textrender.showBufferScrollIndicator
-            z: 5
-        }
-
         TextRender {
             id: textrender
             objectName: "textrender"
@@ -179,8 +170,7 @@ ApplicationWindow {
 
             myWidth: width
             myHeight: height
-            opacity: 1.0
-            property int duration: 0;
+            property int duration: 0
             property int cutAfter: height
 
             Behavior on opacity {
@@ -209,7 +199,7 @@ ApplicationWindow {
         Connections {
             target: util
             onVisualBell: {
-                window.visualBell();
+                bellTimer.start()
             }
             onWindowTitleChanged: {
                 appWindow.windowTitle = util.currentWindowTitle()
@@ -261,7 +251,6 @@ ApplicationWindow {
         function wakeVKB()
         {
             textrender.duration = window.fadeOutTime;
-            util.updateSwipeLock(!vkb.active);
             setTextRenderAttributes();
             updateGesturesAllowed();
         }
@@ -269,14 +258,12 @@ ApplicationWindow {
         function sleepVKB()
         {
             textrender.duration = window.fadeInTime;
-            util.updateSwipeLock(!vkb.active);
             setTextRenderAttributes();
             updateGesturesAllowed();
         }
 
         function setTextRenderAttributes()
         {
-            textrender.opacity = 1.0;
             textrender.cutAfter = textrender.height;
             textrender.y = 0;
         }
@@ -287,62 +274,19 @@ ApplicationWindow {
             setTextRenderAttributes();
         }
 
-        Component.onCompleted: {
-            util.updateSwipeLock(vkb.active)
-        }
-
         function showErrorMessage(message)
         {
-            pageStack.push('MessagePage.qml', {'message': message})
-        }
-
-        function visualBell()
-        {
-            bellTimer.start();
+            console.log('Error message: ' + message)
         }
 
         function updateGesturesAllowed()
         {
             util.allowGestures = !vkb.active;
         }
-
-        /*
-        function lockModeStringToQtEnum(stringMode) {
-            switch (stringMode) {
-            case "auto":
-                return PageOrientation.Automatic
-            case "landscape":
-                return PageOrientation.LockLandscape
-            case "portrait":
-                return PageOrientation.LockPortrait
-            }
-        }
-
-        function getOrientationLockMode()
-        {
-            var stringMode = util.settingsValue("ui/orientationLockMode");
-            page.orientationLock = lockModeStringToQtEnum(stringMode)
-        }
-
-        function setOrientationLockMode(stringMode)
-        {
-            util.setSettingsValue("ui/orientationLockMode", stringMode);
-            page.orientationLock = lockModeStringToQtEnum(stringMode)
-        }
-        */
     }
-    }
-
-    Page {
-        id: menuPage
-
-        MenuFingerterm {
-            id: menu
-            anchors.fill: parent
-        }
     }
 
     Component.onCompleted: {
-        pageStack.pushAttached(menuPage)
+        pageStack.pushAttached('pages/MenuPage.qml', {})
     }
 }

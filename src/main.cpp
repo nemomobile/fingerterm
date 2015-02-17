@@ -38,17 +38,12 @@ extern "C" {
 #include "terminal.h"
 #include "textrender.h"
 #include "util.h"
-#include "version.h"
 #include "keyloader.h"
 
 void defaultSettings(QSettings* settings);
-void copyFilesFromPath(QString from, QString to);
 
 int main(int argc, char *argv[])
 {
-    QSettings *settings = new QSettings(QDir::homePath()+"/.config/FingerTerm/settings.ini", QSettings::IniFormat);
-    defaultSettings(settings);
-
     // fork the child process before creating QGuiApplication
     int socketM;
     int pid = forkpty(&socketM,NULL,NULL,NULL);
@@ -56,16 +51,13 @@ int main(int argc, char *argv[])
         qFatal("forkpty failed");
         exit(1);
     } else if( pid==0 ) {
-        setenv("TERM", settings->value("terminal/envVarTERM").toByteArray(), 1);
+        setenv("TERM", "xterm", 1);
 
         QString execCmd;
         int loginShell = 0;
         for(int i=0; i<argc-1; i++) {
             if( QString(argv[i]) == "-e" )
                 execCmd = QString(argv[i+1]);
-        }
-        if(execCmd.isEmpty()) {
-            execCmd = settings->value("general/execCmd").toString();
         }
         if(execCmd.isEmpty()) {
             // unset $POSIXLY_CORRECT to avoid bash going into restricted mode
@@ -77,9 +69,6 @@ int main(int argc, char *argv[])
             execCmd.append(" --login");
             loginShell = 1;
         }
-
-        if(settings)
-            delete settings; // don't need 'em here
 
         QStringList execParts;
         if(loginShell) {
@@ -104,6 +93,9 @@ int main(int argc, char *argv[])
 
     QGuiApplication *app = static_cast<QGuiApplication *>(SailfishApp::application(argc, argv));
 
+    QSettings settings;
+    defaultSettings(&settings);
+
     QScreen* sc = app->primaryScreen();
     if(sc){
     sc->setOrientationUpdateMask(Qt::PrimaryOrientation
@@ -117,23 +109,12 @@ int main(int argc, char *argv[])
     QQuickView *view = SailfishApp::createView();
 
     Terminal term;
-    Util util(settings);
+    Util util(&settings);
     term.setUtil(&util);
     QString startupErrorMsg;
 
-    // copy the default config files to the config dir if they don't already exist
-    copyFilesFromPath(SailfishApp::pathTo("data").toLocalFile(), util.configPath());
-
     KeyLoader keyLoader(&util);
-    bool ret = keyLoader.loadLayout( settings->value("ui/keyboardLayout").toString() );
-    if(!ret) {
-        // on failure, try to load the default one (shell)
-        startupErrorMsg = "There was an error loading the keyboard layout.<br>\nUsing the default one instead.";
-        qDebug() << "Loading fallback toolbar layout";
-        ret = keyLoader.loadDefaultLayout();
-        if(!ret)
-            qFatal("failure loading keyboard layout");
-    }
+    keyLoader.loadDefaultLayout();
 
     QQmlContext *context = view->rootContext();
     context->setContextProperty( "term", &term );
@@ -163,17 +144,9 @@ int main(int argc, char *argv[])
     QObject::connect(&term,SIGNAL(displayBufferChanged()),win,SLOT(displayBufferChanged()));
     QObject::connect(view->engine(),SIGNAL(quit()),app,SLOT(quit()));
 
-    QSize screenSize = QGuiApplication::primaryScreen()->size();
-    if ((screenSize.width() < 1024 || screenSize.height() < 768 || app->arguments().contains("-fs"))
-            && !app->arguments().contains("-nofs"))
-    {
-        view->showFullScreen();
-    } else {
-        view->show();
-    }
+    view->show();
 
-    PtyIFace ptyiface(pid, socketM, &term,
-                       settings->value("terminal/charset").toString());
+    PtyIFace ptyiface(pid, socketM, &term, "UTF-8");
 
     if( ptyiface.failed() )
         qFatal("pty failure");
@@ -185,25 +158,17 @@ void defaultSettings(QSettings* settings)
 {
     QMap<QString, QVariant> defaults;
 
-    defaults["ui/orientationLockMode"] = "auto";
     defaults["general/execCmd"] = "";
-    defaults["general/visualBell"] = true;
     defaults["general/backgroundBellNotify"] = true;
     defaults["general/grabUrlsFromBackbuffer"] = false;
-
-    defaults["terminal/envVarTERM"] = "xterm";
-    defaults["terminal/charset"] = "UTF-8";
 
     defaults["ui/keyboardLayout"] = "shell";
     defaults["ui/fontSize"] = 11;
     defaults["ui/keyboardMargins"] = 10;
-    defaults["ui/allowSwipe"] = "auto";   // "true", "false", "auto"
     defaults["ui/keyboardFadeOutDelay"] = 4000;
-    defaults["ui/keyPressFeedback"] = true;
     defaults["ui/dragMode"] = "scroll";  // "gestures, "scroll", "select" ("off" would also be ok)
 
     defaults["state/showWelcomeScreen"] = true;
-    defaults["state/createdByVersion"] = PROGRAM_VERSION;
 
     defaults["gestures/panLeftTitle"] = "Alt-Right";
     defaults["gestures/panLeftCommand"] = "\\e\\e[C";
@@ -218,16 +183,5 @@ void defaultSettings(QSettings* settings)
         if (!settings->contains(key)) {
             settings->setValue(key, defaults.value(key));
         }
-    }
-}
-
-void copyFilesFromPath(QString from, QString to)
-{
-    QDir fromDir(from);
-    QDir toDir(to);
-
-    // Copy files from fromDir to toDir, but don't overwrite existing ones
-    foreach (const QString &filename, fromDir.entryList(QDir::Files)) {
-        QFile(fromDir.filePath(filename)).copy(toDir.filePath(filename));
     }
 }
