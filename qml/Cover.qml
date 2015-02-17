@@ -37,12 +37,6 @@ CoverBackground {
 
         color: Theme.secondaryColor
 
-        text: {
-            var res = ''
-            for (var i=0; i<appWindow.lines.length; i++) {
-                res = res + appWindow.lines[i] + '\n'
-            }
-            return res.trim()
-        }
+        text: appWindow.lines.join('\n').trim()
     }
 }
