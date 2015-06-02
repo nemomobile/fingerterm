@@ -43,8 +43,6 @@ Util::Util(QSettings *settings, QObject *parent) :
 
 Util::~Util()
 {
-    // clear the notifications on quit
-    clearNotifications();
 }
 
 void Util::setWindow(QQuickView* win)
@@ -116,10 +114,6 @@ int Util::uiFontSize()
 void Util::bellAlert()
 {
     emit visualBell();
-}
-
-void Util::clearNotifications()
-{
 }
 
 void Util::mousePress(float eventX, float eventY) {

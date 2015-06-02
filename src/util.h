@@ -88,7 +88,6 @@ private:
 
     void scrollBackBuffer(QPointF now, QPointF last);
     void doGesture(PanGesture gesture);
-    void clearNotifications();
     void selectionHelper(QPointF scenePos);
 
     QPointF dragOrigin;
