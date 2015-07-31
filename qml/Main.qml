@@ -21,6 +21,7 @@ import QtQuick 2.0
 import TextRender 1.0
 import QtQuick.Window 2.0
 import com.nokia.meego 2.0
+import org.freedesktop.contextkit 1.0
 
 PageStackWindow {
     id: pageStackWindow
@@ -32,6 +33,14 @@ PageStackWindow {
     }
 
     property string windowTitle: util.currentWindowTitle();
+    property bool physicalKeyboardOpen: keyboardOpenContextProperty.value
+
+    onPhysicalKeyboardOpenChanged: window.setTextRenderAttributes()
+
+    ContextProperty {
+        id: keyboardOpenContextProperty
+        key: "maemo/InternalKeyboard/Open"
+    }
 
     initialPage:Page {
         id: page
@@ -390,7 +399,7 @@ PageStackWindow {
 
         function setTextRenderAttributes()
         {
-            if(util.settingsValue("ui/vkbShowMethod")==="move")
+            if(util.settingsValue("ui/vkbShowMethod")==="move" && !physicalKeyboardOpen)
             {
                 vkb.visibleSetting = true;
                 textrender.opacity = 1.0;
@@ -408,7 +417,7 @@ PageStackWindow {
                     textrender.y = 0;
                 }
             }
-            else if(util.settingsValue("ui/vkbShowMethod")==="fade")
+            else if(util.settingsValue("ui/vkbShowMethod")==="fade" && !physicalKeyboardOpen)
             {
                 vkb.visibleSetting = true;
                 textrender.cutAfter = textrender.height;
@@ -418,7 +427,7 @@ PageStackWindow {
                 else
                     textrender.opacity = 1.0;
             }
-            else // "off" (vkb disabled)
+            else // "off" (vkb disabled, or physicalKeyboardOpen)
             {
                 vkb.visibleSetting = false;
                 textrender.cutAfter = textrender.height;

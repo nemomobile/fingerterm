@@ -93,13 +93,13 @@ Rectangle {
 
     function setPosition(vkbActive)
     {
-        if( util.settingsValue("ui/vkbShowMethod")==="off" ) {
+        if( util.settingsValue("ui/vkbShowMethod")==="off" || physicalKeyboardOpen ) {
             lineView.visible = false;
             return;
         }
 
         lineView.visible = true;
-        if(vkbActive && util.settingsValue("ui/vkbShowMethod")!=="move") {
+        if((vkbActive && util.settingsValue("ui/vkbShowMethod")!=="move") && !physicalKeyboardOpen) {
             y = 0;
         } else {
             y = -(height+window.paddingSmall)
