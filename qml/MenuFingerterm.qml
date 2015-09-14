@@ -32,6 +32,7 @@ Rectangle {
     property bool enablePaste: false
     property string currentSwipeLocking: util.settingsValue("ui/allowSwipe")
     property string currentShowMethod: util.settingsValue("ui/vkbShowMethod")
+    property string currentHideWhenPhysicalConnected: util.settingsValue("ui/vkbHideWhenPhysicalConnected")
     property string currentDragMode: util.settingsValue("ui/dragMode")
     property string currentOrientationLockMode: util.settingsValue("ui/orientationLockMode")
     property int keyboardFadeOutDelay: util.settingsValue("ui/keyboardFadeOutDelay")
@@ -366,6 +367,41 @@ Rectangle {
                                         width: window.buttonWidthSmall
                                         height: window.buttonHeightSmall
                                     }
+                                }
+                            }
+                        }
+                        Rectangle {
+                            width: window.buttonWidthLarge
+                            height: window.buttonHeightLarge
+                            radius: window.radiusSmall
+                            color: "#606060"
+                            border.color: "#000000"
+                            border.width: 1
+                            Column {
+                                Text {
+                                    width: window.buttonWidthLarge
+                                    height: window.headerHeight
+                                    color: "#ffffff"
+                                    font.pointSize: window.uiFontSize-1
+                                    text: "Physical keyboard"
+                                    horizontalAlignment: Text.AlignHCenter
+                                }
+                                Button {
+                                    text: "Hides VKB"
+                                    highlighted: currentHideWhenPhysicalConnected=="on"
+                                    onClicked: {
+                                        if (currentHideWhenPhysicalConnected=="off") {
+                                            util.setSettingsValue("ui/vkbHideWhenPhysicalConnected", "on");
+                                            currentHideWhenPhysicalConnected = "on";
+                                        } else {
+                                            util.setSettingsValue("ui/vkbHideWhenPhysicalConnected", "off");
+                                            currentHideWhenPhysicalConnected = "off";
+                                        }
+                                        window.setTextRenderAttributes();
+                                        hideMenu();
+                                    }
+                                    width: window.buttonWidthLarge
+                                    height: window.buttonHeightSmall
                                 }
                             }
                         }

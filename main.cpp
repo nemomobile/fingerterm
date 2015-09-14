@@ -225,6 +225,8 @@ void defaultSettings(QSettings* settings)
         settings->setValue("ui/showExtraLinesFromCursor", 1);
     if(!settings->contains("ui/vkbShowMethod"))
         settings->setValue("ui/vkbShowMethod", "move");  // "fade", "move", "off"
+    if(!settings->contains("ui/vkbHideWhenPhysicalConnected"))
+        settings->setValue("ui/vkbHideWhenPhysicalConnected", "off");  // "on", "off"
     if(!settings->contains("ui/keyPressFeedback"))
         settings->setValue("ui/keyPressFeedback", true);
     if(!settings->contains("ui/dragMode"))

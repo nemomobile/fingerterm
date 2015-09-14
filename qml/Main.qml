@@ -399,7 +399,8 @@ PageStackWindow {
 
         function setTextRenderAttributes()
         {
-            if(util.settingsValue("ui/vkbShowMethod")==="move" && !physicalKeyboardOpen)
+            if(util.settingsValue("ui/vkbShowMethod")==="move" && !( physicalKeyboardOpen &&
+                util.settingsValue("ui/vkbHideWhenPhysicalConnected")==="on" ) )
             {
                 vkb.visibleSetting = true;
                 textrender.opacity = 1.0;
@@ -417,7 +418,8 @@ PageStackWindow {
                     textrender.y = 0;
                 }
             }
-            else if(util.settingsValue("ui/vkbShowMethod")==="fade" && !physicalKeyboardOpen)
+            else if(util.settingsValue("ui/vkbShowMethod")==="fade" && !( physicalKeyboardOpen &&
+                util.settingsValue("ui/vkbHideWhenPhysicalConnected")==="on" ) )
             {
                 vkb.visibleSetting = true;
                 textrender.cutAfter = textrender.height;
